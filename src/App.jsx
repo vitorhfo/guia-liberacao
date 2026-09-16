@@ -224,6 +224,7 @@ function App() {
   const [selectedVisibility, setSelectedVisibility] = useState('pouco');
   const [showChecklist, setShowChecklist] = useState(false);
   const [openGallery, setOpenGallery] = useState(null);
+  const [expandedGalleryImage, setExpandedGalleryImage] = useState(null);
   const sections = useMemo(() => ['inicio', 'fluxo', 'condicoes', 'classes', 'matriz', 'atencao', 'exemplos'], []);
 
   const go = (index) => {
@@ -246,7 +247,7 @@ function App() {
     const onKey = (event) => {
       if (['INPUT', 'SELECT', 'TEXTAREA'].includes(event.target.tagName)) return;
       if (openGallery) {
-        if (event.key === 'Escape') setOpenGallery(null);
+        if (event.key === 'Escape') { setOpenGallery(null); setExpandedGalleryImage(null); }
         return;
       }
       if (event.key === 'ArrowRight' || event.key === 'ArrowDown') go(active + 1);
@@ -382,7 +383,7 @@ function App() {
       <section id="exemplos" className={`presentation-section examples-section ${active === 6 ? 'section-active' : ''}`}>
         <SectionHeader eyebrow="03.2" title="Exemplos de não conformidades" text="Selecione um problema para abrir todas as fotos registradas." />
         <div className="gallery defect-gallery">
-          {defectGalleries.map((gallery) => <button key={gallery.label} className="defect-gallery-card" onClick={() => setOpenGallery(gallery)}>
+          {defectGalleries.map((gallery) => <button key={gallery.label} className="defect-gallery-card" onClick={() => { setOpenGallery(gallery); setExpandedGalleryImage(null); }}>
             <img src={gallery.images[0]} alt={`Exemplo de ${gallery.label.toLowerCase()}`} />
             <span className="defect-gallery-shade" />
             <span className="defect-gallery-meta"><span><X size={14} /> REPROVAR</span><strong>{gallery.label}</strong><small>{gallery.images.length} {gallery.images.length === 1 ? 'foto' : 'fotos'} <ZoomIn size={14} /></small></span>
@@ -393,10 +394,10 @@ function App() {
       </section>
 
       {openGallery && <div className="gallery-modal" role="dialog" aria-modal="true" aria-label={`Fotos de ${openGallery.label}`}>
-        <button className="gallery-modal-backdrop" onClick={() => setOpenGallery(null)} aria-label="Fechar galeria" />
+        <button className="gallery-modal-backdrop" onClick={() => { setOpenGallery(null); setExpandedGalleryImage(null); }} aria-label="Fechar galeria" />
         <div className="gallery-modal-panel">
-          <header><div><span className="eyebrow">NÃO CONFORMIDADE</span><h2>{openGallery.label}</h2><p>{openGallery.images.length} {openGallery.images.length === 1 ? 'foto registrada' : 'fotos registradas'}</p></div><button className="gallery-modal-close" onClick={() => setOpenGallery(null)} aria-label="Fechar galeria"><X /></button></header>
-          <div className="gallery-modal-grid">{openGallery.images.map((image, index) => <figure key={image}><img src={image} alt={`${openGallery.label} — foto ${index + 1}`} /><figcaption>Foto {String(index + 1).padStart(2, '0')}</figcaption></figure>)}</div>
+          <header><div><span className="eyebrow">NÃO CONFORMIDADE</span><h2>{openGallery.label}</h2><p>{openGallery.images.length} {openGallery.images.length === 1 ? 'foto registrada' : 'fotos registradas'}</p></div><button className="gallery-modal-close" onClick={() => { setOpenGallery(null); setExpandedGalleryImage(null); }} aria-label="Fechar galeria"><X /></button></header>
+          <div className="gallery-modal-grid">{openGallery.images.map((image, index) => <figure key={image} className={expandedGalleryImage === image ? 'expanded' : ''} onClick={() => setExpandedGalleryImage(expandedGalleryImage === image ? null : image)} role="button" tabIndex="0" onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); setExpandedGalleryImage(expandedGalleryImage === image ? null : image); } }}><img src={image} alt={`${openGallery.label} — foto ${index + 1}`} /><figcaption>Foto {String(index + 1).padStart(2, '0')}</figcaption></figure>)}</div>
         </div>
       </div>}
 
