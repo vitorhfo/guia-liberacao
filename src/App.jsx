@@ -147,17 +147,17 @@ const defectGalleries = [
     label: 'Falha de cobertura',
     images: [
       new URL('../img/defeitos/falhaDeCobertura/IMG-20260720-WA0073.jpeg', import.meta.url).href,
-      new URL('../img/defeitos/falhaDeCobertura/Imagem2.jpg', import.meta.url).href,
-      new URL('../img/defeitos/falhaDeCobertura/Imagem3.jpg', import.meta.url).href,
+      new URL('../img/defeitos/falhaDeCobertura/Imagem2-tratada.jpg', import.meta.url).href,
+      new URL('../img/defeitos/falhaDeCobertura/Imagem3-tratada.jpg', import.meta.url).href,
     ],
   },
   {
     label: 'Desplacamento',
     images: [
-      new URL('../img/defeitos/desplacamento/Imagem4.jpg', import.meta.url).href,
-      new URL('../img/defeitos/desplacamento/Imagem5.jpg', import.meta.url).href,
-      new URL('../img/defeitos/desplacamento/Imagem6.jpg', import.meta.url).href,
-      new URL('../img/defeitos/desplacamento/Imagem7.jpg', import.meta.url).href,
+      new URL('../img/defeitos/desplacamento/Imagem4-tratada.jpg', import.meta.url).href,
+      new URL('../img/defeitos/desplacamento/Imagem5-tratada.jpg', import.meta.url).href,
+      new URL('../img/defeitos/desplacamento/Imagem6-tratada.jpg', import.meta.url).href,
+      new URL('../img/defeitos/desplacamento/Imagem7-tratada.png', import.meta.url).href,
     ],
   },
   {
@@ -186,7 +186,7 @@ const defectGalleries = [
       new URL('../img/defeitos/sujeira/IMG-20260723-WA0002.jpg', import.meta.url).href,
       new URL('../img/defeitos/sujeira/IMG-20260730-WA0030.jpg', import.meta.url).href,
       new URL('../img/defeitos/sujeira/IMG-20260730-WA0031.jpg', import.meta.url).href,
-      new URL('../img/defeitos/sujeira/Imagem1.jpg', import.meta.url).href,
+      new URL('../img/defeitos/sujeira/Imagem1-tratada.jpg', import.meta.url).href,
     ],
   },
 ];
