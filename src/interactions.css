@@ -192,6 +192,12 @@ body { overscroll-behavior: none; }
   .attention-card { min-height:210px; padding:16px; }
   .defect-gallery { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
   .defect-gallery-card { min-height:175px; }
+  .class-scale { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .class-item { min-height:118px; padding:12px; }
+  .class-number { font-size:40px; }
+  .class-label { font-size:11px; }
+  .class-item small { min-height:18px; font-size:7px; }
+  .class-details { min-height:0; margin-top:14px; }
   .defect-gallery-meta { padding:13px; }
   .defect-gallery-meta strong { font-size:23px; }
   .final-call { align-items:flex-start; flex-direction:column; margin-top:22px; }
