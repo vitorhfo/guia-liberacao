@@ -114,3 +114,23 @@ body { overscroll-behavior: none; }
 .presentation-section { transition: none; transform: none; }
 .presentation-section:not(.section-active) { display: none; }
 .presentation-section.section-active { display: flex; transform: none; }
+
+@media (max-width:600px) {
+  .presentation-section.section-active { justify-content:flex-start; overflow-x:hidden; overflow-y:auto; padding:86px 48px 82px 20px; -webkit-overflow-scrolling:touch; }
+  .hero.presentation-section.section-active { justify-content:center; }
+  .footer-rule { flex:0 0 auto; }
+  .floating-controls { display:none; }
+  .slide-rail { bottom:14px; }
+  .attention-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+  .attention-card { min-height:210px; padding:16px; }
+  .defect-gallery { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+  .defect-gallery-card { min-height:210px; }
+  .defect-gallery-meta { padding:13px; }
+  .defect-gallery-meta strong { font-size:23px; }
+  .final-call { align-items:flex-start; flex-direction:column; margin-top:22px; }
+  .gallery-modal { padding:14px; }
+  .gallery-modal-panel { max-height:calc(100vh - 28px); padding:20px; }
+  .gallery-modal-panel h2 { font-size:38px; }
+  .gallery-modal-grid { grid-template-columns:1fr; }
+  .gallery-modal-grid figure { min-height:300px; }
+}
