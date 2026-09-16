@@ -179,14 +179,16 @@ body { overscroll-behavior: none; }
 
 /* Reações do resultado: fogos verdes para liberação, lágrimas vermelhas para reprovação
    e pulso amarelo para os casos que ainda exigem avaliação. */
-.outcome { position:relative; overflow:hidden; padding-right:86px; }
+.outcome { position:relative; overflow:visible; padding-right:74px; }
 .outcome-context { grid-column:2; color:#c4cbcd; font-size:10px; }
-.outcome-reaction { position:absolute; top:50%; right:17px; width:48px; height:48px; pointer-events:none; transform:translateY(-50%); }
+.outcome-reaction { position:absolute; top:50%; right:-28px; width:48px; height:48px; pointer-events:none; transform:translateY(-50%); }
+.reaction-release { right:-34px; }
 .reaction-release i { position:absolute; top:22px; left:22px; width:7px; height:7px; border-radius:50%; background:#46df91; box-shadow:0 0 9px rgba(70,223,145,.9); animation:release-burst .9s cubic-bezier(.16,.76,.35,1) both; transform:rotate(var(--angle)) translateX(0); }
 .reaction-release i:nth-child(3n) { width:5px; height:5px; background:#c8ff6f; }
 .reaction-release i:nth-child(2n) { animation-delay:.07s; }
 .reaction-release i:nth-child(4n) { animation-delay:.13s; }
-.reaction-reject { display:flex; align-items:flex-start; justify-content:center; gap:7px; padding-top:6px; }
+.outcome-✕ { margin-bottom:35px; }
+.reaction-reject { top:calc(100% + 2px); right:22px; display:flex; align-items:flex-start; justify-content:center; gap:7px; padding-top:1px; transform:none; }
 .reaction-reject i { width:10px; height:14px; border-radius:70% 30% 65% 35%; background:#ff5c57; box-shadow:0 0 8px rgba(255,92,87,.55); animation:red-tear 1.2s ease-in infinite; transform:rotate(45deg); }
 .reaction-reject i:nth-child(2) { margin-top:8px; animation-delay:.28s; }
 .reaction-reject i:nth-child(3) { margin-top:2px; animation-delay:.56s; }
@@ -205,7 +207,9 @@ body { overscroll-behavior: none; }
   .slide-rail { bottom:14px; }
   .decision-tool { grid-template-columns:1fr; align-items:stretch; }
   .outcome { padding-right:74px; }
-  .outcome-reaction { right:12px; transform:translateY(-50%) scale(.84); }
+  .outcome-reaction { right:-22px; transform:translateY(-50%) scale(.84); }
+  .reaction-release { right:-26px; }
+  .reaction-reject { right:12px; transform:scale(.84); transform-origin:top right; }
   .decision-tool > div:first-child, .criterion-note { grid-column:auto; }
   .criterion-note { grid-template-columns:auto 1fr; align-items:start; }
   .criterion-note p { grid-column:1/-1; }
