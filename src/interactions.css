@@ -192,13 +192,14 @@ body { overscroll-behavior: none; }
 .reaction-reject i { width:10px; height:14px; border-radius:70% 30% 65% 35%; background:#ff5c57; box-shadow:0 0 8px rgba(255,92,87,.55); animation:red-tear 1.55s ease-in infinite; animation-delay:var(--delay); transform:rotate(45deg); }
 .reaction-reject i:nth-child(3n) { margin-top:4px; }
 .reaction-reject i:nth-child(4n) { margin-top:9px; }
-.reaction-review { top:50%; right:-28px; width:48px; height:48px; display:grid; place-items:center; transform:translateY(-50%); }
-.reaction-review i { position:absolute; width:18px; height:18px; border:2px solid #ffd64b; border-radius:50%; animation:review-pulse 1.45s ease-out infinite; }
+.reaction-review { inset:-7px; border-radius:19px; }
+.reaction-review i { position:absolute; inset:0; border:2px solid #ffd64b; border-radius:inherit; box-shadow:0 0 14px rgba(255,214,75,.38); animation:review-pulse 1.6s ease-out infinite; }
 .reaction-review i:last-child { animation-delay:.7s; }
 /* Cada explosão ocupa o início do ciclo; o restante cria uma pausa limpa antes da próxima. */
 @keyframes release-burst { 0% { opacity:0; transform:translate(-50%,-50%) rotate(var(--angle)) translateX(0) scale(.25); } 5% { opacity:1; } 21% { opacity:0; transform:translate(-50%,-50%) rotate(var(--angle)) translateX(var(--distance)) scale(.6); } 100% { opacity:0; transform:translate(-50%,-50%) rotate(var(--angle)) translateX(var(--distance)) scale(.6); } }
 @keyframes red-tear { 0% { opacity:0; transform:translateY(-4px) rotate(45deg) scale(.65); } 25% { opacity:1; } 78% { opacity:1; } 100% { opacity:0; transform:translateY(26px) rotate(45deg) scale(.85); } }
-@keyframes review-pulse { 0% { opacity:.9; transform:scale(.35); } 100% { opacity:0; transform:scale(2.25); } }
+/* Dois anéis ocupam toda a borda e alternam o pulso para indicar que há avaliação pendente. */
+@keyframes review-pulse { 0% { opacity:.9; transform:scale(.98); } 68% { opacity:0; transform:scale(1.08); } 100% { opacity:0; transform:scale(1.08); } }
 
 @media (max-width:600px) {
   .presentation-section.section-active { justify-content:flex-start; overflow-x:hidden; overflow-y:auto; padding:86px 48px 82px 20px; -webkit-overflow-scrolling:touch; }
@@ -211,7 +212,7 @@ body { overscroll-behavior: none; }
   .reaction-release { inset:-17px; }
   .reaction-reject { right:8px; left:8px; }
   .reaction-reject i { width:8px; height:12px; }
-  .reaction-review { right:-22px; transform:translateY(-50%) scale(.84); }
+  .reaction-review { inset:-5px; }
   .decision-tool > div:first-child, .criterion-note { grid-column:auto; }
   .criterion-note { grid-template-columns:auto 1fr; align-items:start; }
   .criterion-note p { grid-column:1/-1; }
