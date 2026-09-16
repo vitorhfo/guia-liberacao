@@ -102,7 +102,7 @@ body { overscroll-behavior: none; }
   .decision-tool { padding: 8px 18px; gap: 12px; }
   .decision-tool h3 { font-size: 22px; }
   .decision-tool p { font-size: 10px; }
-  .decision-tool select { margin-top: 4px; padding: 7px 8px; }
+  .decision-tool select, .decision-tool input { margin-top: 4px; padding: 7px 8px; }
   .outcome { min-height: 44px; }
   .criterion-note { gap: 5px 9px; padding-top: 6px; }
   .criterion-note p { font-size: 9px; }
@@ -121,6 +121,10 @@ body { overscroll-behavior: none; }
 .presentation-section { transition: none; transform: none; }
 .presentation-section:not(.section-active) { display: none; }
 .presentation-section.section-active { display: flex; transform: none; }
+
+.decision-intro { grid-column: 1 / -1; }
+.decision-tool input { width: 100%; margin-top: 7px; padding: 11px 9px; border: 1px solid #4a5357; color: #fff; background: #252c2f; font-size: 12px; }
+.decision-tool input::placeholder { color: #9ca5a8; }
 
 @media (max-width:600px) {
   .presentation-section.section-active { justify-content:flex-start; overflow-x:hidden; overflow-y:auto; padding:86px 48px 82px 20px; -webkit-overflow-scrolling:touch; }
