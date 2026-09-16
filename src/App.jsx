@@ -146,11 +146,18 @@ const nav = [
   { label: 'Exemplos', Icon: ImageOff },
 ];
 
-// Direções das partículas verdes usadas na reação de liberação.
-const releaseParticles = Array.from({ length: 12 }, (_, index) => ({
-  angle: `${index * 30}deg`,
-  distance: `${24 + (index % 3) * 8}px`,
-}));
+// Partículas verdes distribuídas em volta de toda a caixa de liberação.
+const releaseParticles = Array.from({ length: 24 }, (_, index) => {
+  const side = Math.floor(index / 6);
+  const position = `${((index % 6) + 1) * (100 / 7)}%`;
+  const directions = [[-110, -90, -70], [70, 90, 110], [160, 180, 200], [-20, 0, 20]];
+  return {
+    x: side < 2 ? position : side === 2 ? '0%' : '100%',
+    y: side < 2 ? (side === 0 ? '0%' : '100%') : position,
+    angle: `${directions[side][index % 3]}deg`,
+    distance: `${20 + (index % 3) * 8}px`,
+  };
+});
 
 // Galerias de fotos exibidas no slide final. Cada item tem uma capa e todos os exemplos disponíveis.
 const defectGalleries = [
@@ -223,14 +230,14 @@ function Status({ value }) {
   return <span className={`status status-${value}`} title={status.label} aria-label={status.label}><Icon size={15} strokeWidth={3} /></span>;
 }
 
-// Mostra uma reação visual curta para cada tipo de resultado da consulta.
-// Verde explode como fogos; vermelho cai como lágrimas; amarelo pulsa enquanto exige avaliação.
+// Mostra uma reação visual contínua para cada tipo de resultado da consulta.
+// Verde explode no contorno; vermelho cai pela base; amarelo pulsa enquanto exige avaliação.
 function OutcomeReaction({ outcome }) {
   if (outcome === '✓') {
-    return <span className="outcome-reaction reaction-release" aria-hidden="true">{releaseParticles.map((particle, index) => <i key={index} style={{ '--angle': particle.angle, '--distance': particle.distance }} />)}</span>;
+    return <span className="outcome-reaction reaction-release" aria-hidden="true">{releaseParticles.map((particle, index) => <i key={index} style={{ '--x': particle.x, '--y': particle.y, '--angle': particle.angle, '--distance': particle.distance }} />)}</span>;
   }
   if (outcome === '✕') {
-    return <span className="outcome-reaction reaction-reject" aria-hidden="true"><i /><i /><i /></span>;
+    return <span className="outcome-reaction reaction-reject" aria-hidden="true">{Array.from({ length: 11 }, (_, index) => <i key={index} style={{ '--delay': `${index * .14}s` }} />)}</span>;
   }
   return <span className="outcome-reaction reaction-review" aria-hidden="true"><i /><i /></span>;
 }

@@ -181,22 +181,22 @@ body { overscroll-behavior: none; }
    e pulso amarelo para os casos que ainda exigem avaliação. */
 .outcome { position:relative; overflow:visible; padding-right:74px; }
 .outcome-context { grid-column:2; color:#c4cbcd; font-size:10px; }
-.outcome-reaction { position:absolute; top:50%; right:-28px; width:48px; height:48px; pointer-events:none; transform:translateY(-50%); }
-.reaction-release { right:-34px; }
-.reaction-release i { position:absolute; top:22px; left:22px; width:7px; height:7px; border-radius:50%; background:#46df91; box-shadow:0 0 9px rgba(70,223,145,.9); animation:release-burst 4.2s cubic-bezier(.16,.76,.35,1) infinite; transform:rotate(var(--angle)) translateX(0); }
+.outcome-reaction { position:absolute; pointer-events:none; }
+.reaction-release { inset:-22px; }
+.reaction-release i { position:absolute; top:var(--y); left:var(--x); width:7px; height:7px; border-radius:50%; background:#46df91; box-shadow:0 0 9px rgba(70,223,145,.9); animation:release-burst 4.2s cubic-bezier(.16,.76,.35,1) infinite; transform:translate(-50%,-50%) rotate(var(--angle)) translateX(0) scale(.25); }
 .reaction-release i:nth-child(3n) { width:5px; height:5px; background:#c8ff6f; }
 .reaction-release i:nth-child(2n) { animation-delay:.07s; }
 .reaction-release i:nth-child(4n) { animation-delay:.13s; }
 .outcome-✕ { margin-bottom:35px; }
-.reaction-reject { top:calc(100% + 2px); right:22px; display:flex; align-items:flex-start; justify-content:center; gap:7px; padding-top:1px; transform:none; }
-.reaction-reject i { width:10px; height:14px; border-radius:70% 30% 65% 35%; background:#ff5c57; box-shadow:0 0 8px rgba(255,92,87,.55); animation:red-tear 1.2s ease-in infinite; transform:rotate(45deg); }
-.reaction-reject i:nth-child(2) { margin-top:8px; animation-delay:.28s; }
-.reaction-reject i:nth-child(3) { margin-top:2px; animation-delay:.56s; }
-.reaction-review { display:grid; place-items:center; }
+.reaction-reject { top:calc(100% + 2px); right:12px; left:12px; height:34px; display:flex; align-items:flex-start; justify-content:space-around; padding-top:1px; }
+.reaction-reject i { width:10px; height:14px; border-radius:70% 30% 65% 35%; background:#ff5c57; box-shadow:0 0 8px rgba(255,92,87,.55); animation:red-tear 1.55s ease-in infinite; animation-delay:var(--delay); transform:rotate(45deg); }
+.reaction-reject i:nth-child(3n) { margin-top:4px; }
+.reaction-reject i:nth-child(4n) { margin-top:9px; }
+.reaction-review { top:50%; right:-28px; width:48px; height:48px; display:grid; place-items:center; transform:translateY(-50%); }
 .reaction-review i { position:absolute; width:18px; height:18px; border:2px solid #ffd64b; border-radius:50%; animation:review-pulse 1.45s ease-out infinite; }
 .reaction-review i:last-child { animation-delay:.7s; }
 /* Cada explosão ocupa o início do ciclo; o restante cria uma pausa limpa antes da próxima. */
-@keyframes release-burst { 0% { opacity:0; transform:rotate(var(--angle)) translateX(0) scale(.25); } 5% { opacity:1; } 21% { opacity:0; transform:rotate(var(--angle)) translateX(var(--distance)) scale(.6); } 100% { opacity:0; transform:rotate(var(--angle)) translateX(var(--distance)) scale(.6); } }
+@keyframes release-burst { 0% { opacity:0; transform:translate(-50%,-50%) rotate(var(--angle)) translateX(0) scale(.25); } 5% { opacity:1; } 21% { opacity:0; transform:translate(-50%,-50%) rotate(var(--angle)) translateX(var(--distance)) scale(.6); } 100% { opacity:0; transform:translate(-50%,-50%) rotate(var(--angle)) translateX(var(--distance)) scale(.6); } }
 @keyframes red-tear { 0% { opacity:0; transform:translateY(-4px) rotate(45deg) scale(.65); } 25% { opacity:1; } 78% { opacity:1; } 100% { opacity:0; transform:translateY(26px) rotate(45deg) scale(.85); } }
 @keyframes review-pulse { 0% { opacity:.9; transform:scale(.35); } 100% { opacity:0; transform:scale(2.25); } }
 
@@ -208,9 +208,10 @@ body { overscroll-behavior: none; }
   .slide-rail { bottom:14px; }
   .decision-tool { grid-template-columns:1fr; align-items:stretch; }
   .outcome { padding-right:74px; }
-  .outcome-reaction { right:-22px; transform:translateY(-50%) scale(.84); }
-  .reaction-release { right:-26px; }
-  .reaction-reject { right:12px; transform:scale(.84); transform-origin:top right; }
+  .reaction-release { inset:-17px; }
+  .reaction-reject { right:8px; left:8px; }
+  .reaction-reject i { width:8px; height:12px; }
+  .reaction-review { right:-22px; transform:translateY(-50%) scale(.84); }
   .decision-tool > div:first-child, .criterion-note { grid-column:auto; }
   .criterion-note { grid-template-columns:auto 1fr; align-items:start; }
   .criterion-note p { grid-column:1/-1; }
