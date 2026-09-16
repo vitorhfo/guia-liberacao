@@ -89,25 +89,31 @@ const quantityLevels = [
 const measurementScales = {
   dirt: {
     label: 'Tamanho da partícula',
-    bands: [{ group: 'A', max: 1 }, { group: 'B', max: 2 }, { group: 'C/D', max: 3 }, { group: 'E', max: 5 }, { group: 'F', max: 10 }], visibleEnd: 2,
+    levels: [
+      { id: 'quase-nada', label: 'Quase nada', groups: ['A'], detail: 'até 1 mm' },
+      { id: 'pouco', label: 'Pouco', groups: ['B', 'C', 'D'], detail: 'acima de 1 até 3 mm' },
+      { id: 'bastante', label: 'Bastante', groups: ['E', 'F'], detail: 'acima de 3 até 10 mm' },
+    ],
   },
   scratch: {
     label: 'Comprimento do risco',
-    bands: [{ group: 'A', max: 0.5 }, { group: 'B', max: 1 }, { group: 'C/D', max: 2 }, { group: 'E', max: 10 }, { group: 'F', max: 20 }], visibleEnd: 2,
+    levels: [
+      { id: 'quase-nada', label: 'Quase nada', groups: ['A'], detail: 'até 0,5 mm' },
+      { id: 'pouco', label: 'Pouco', groups: ['B', 'C', 'D'], detail: 'acima de 0,5 até 2 mm' },
+      { id: 'bastante', label: 'Bastante', groups: ['E', 'F'], detail: 'acima de 2 até 20 mm' },
+    ],
   },
   run: {
     label: 'Extensão do escorrido',
-    bands: [{ group: 'A', max: 0.3 }, { group: 'B', max: 1 }, { group: 'C', max: 5 }, { group: 'D', max: 10 }, { group: 'E', max: 20 }, { group: 'F', max: 30 }], visibleEnd: 3,
+    levels: [
+      { id: 'quase-nada', label: 'Quase nada', groups: ['A'], detail: 'até 0,3 mm' },
+      { id: 'pouco', label: 'Pouco', groups: ['B', 'C'], detail: 'acima de 0,3 até 5 mm' },
+      { id: 'bastante', label: 'Bastante', groups: ['D', 'E', 'F'], detail: 'acima de 5 até 30 mm' },
+    ],
   },
 };
 
 const defectGroups = ['A', 'B', 'C', 'D', 'E', 'F'];
-
-function groupsForMeasurement(scale, value) {
-  if (!scale || value === '' || Number.isNaN(Number(value))) return null;
-  const band = scale.bands.find((item) => Number(value) <= item.max);
-  return band ? band.group.split('/') : [];
-}
 
 function groupLimit(surfaceClass, group, canTransfer) {
   if (!surfaceClass.limits) return Infinity;
@@ -217,7 +223,7 @@ function App() {
   const [selectedDefect, setSelectedDefect] = useState('Escorrido de tinta');
   const [selectedSurfaceClass, setSelectedSurfaceClass] = useState('1A');
   const [selectedVisibility, setSelectedVisibility] = useState('pouco');
-  const [measurementValue, setMeasurementValue] = useState('');
+  const [selectedMeasurementLevel, setSelectedMeasurementLevel] = useState('quase-nada');
   const [selectedQuantity, setSelectedQuantity] = useState('quase-nada');
   const [noHigherDefects, setNoHigherDefects] = useState(false);
   const [showChecklist, setShowChecklist] = useState(false);
@@ -276,11 +282,12 @@ function App() {
   const defectCriterion = defects.find((item) => item.name === selectedDefect) ?? defects[0];
   const visibility = visibilityLevels.find((item) => item.id === selectedVisibility) ?? visibilityLevels[0];
   const measurementScale = measurementScales[defectCriterion.measurement];
+  const measurementLevel = measurementScale?.levels.find((item) => item.id === selectedMeasurementLevel) ?? measurementScale?.levels[0];
   const selectedStandardClass = surfaceClasses.find((item) => item.id === selectedSurfaceClass) ?? surfaceClasses[0];
   const quantity = quantityLevels.find((item) => item.id === selectedQuantity) ?? quantityLevels[0];
   const count = quantity.count;
   const matchingGroups = defectCriterion.type === 'Mensurável'
-    ? groupsForMeasurement(measurementScale, measurementValue)
+    ? measurementLevel?.groups
     : defectCriterion.visual?.[selectedVisibility] ?? null;
   const allowedGroups = matchingGroups?.filter((group) => groupLimit(selectedStandardClass, group, noHigherDefects) >= count) ?? [];
   const blockedGroups = matchingGroups?.filter((group) => !allowedGroups.includes(group)) ?? [];
@@ -296,8 +303,6 @@ function App() {
       : 'O procedimento IT 177 exige segregação e avaliação para decapagem; retoque não é permitido para esta não conformidade.';
   } else if (defectCriterion.policy === 'consult') {
     outcomeDetail = 'A STD 120-0014 não fixa grupo A–F para este defeito. Compare com o padrão aprovado e a especificação da peça antes de liberar.';
-  } else if (defectCriterion.type === 'Mensurável' && measurementValue === '') {
-    outcomeDetail = `Meça ${measurementScale.label.toLowerCase()} em mm. A aparência visual sozinha não define o grupo para defeitos mensuráveis.`;
   } else if (!matchingGroups?.length) {
     outcome = '✕';
     outcomeText = 'Não liberar';
@@ -406,16 +411,16 @@ function App() {
         <div className="matrix-wrap"><table><thead><tr><th>DEFEITO</th><th>TIPO</th><th>I · PRATICAMENTE INVISÍVEL</th><th>II · POUCO VISÍVEL</th><th>III · CLARAMENTE VISÍVEL</th></tr></thead><tbody>{defects.map((item) => <tr key={item.name} className={selectedDefect === item.name ? 'chosen' : ''} onClick={() => setSelectedDefect(item.name)}><th>{item.name}</th><td>{item.type}</td>{item.type === 'Visual' ? <><td>{item.visual.pouco.length ? item.visual.pouco.join('/') : '—'}</td><td>{item.visual.visivel.length ? item.visual.visivel.join('/') : '—'}</td><td>{item.visual.muito.length ? item.visual.muito.join('/') : '—'}</td></> : <td colSpan="3">{item.type === 'Mensurável' ? 'Medir em mm para enquadrar no grupo A–F' : item.policy === 'block' ? 'Não liberar automaticamente' : 'Comparar com o padrão aprovado'}</td>}</tr>)}</tbody></table></div>
         <div className="legend"><span><Status value="✓" /> PODE LIBERAR</span><span><Status value="!" /> LIBERAR CONDICIONADO / AVALIAR</span><span><Status value="✕" /> NÃO LIBERAR</span></div>
         <div className="decision-tool">
-          <div className="decision-intro"><span className="eyebrow">DECISÃO PELA NORMA</span><h3>Pode liberar ou não?</h3><p>Para defeitos visuais, informe a aparência e a quantidade. Para defeitos mensuráveis, a medida em mm define o grupo.</p></div>
-          <label>Defeito<select value={selectedDefect} onChange={(event) => { setSelectedDefect(event.target.value); setMeasurementValue(''); }}>{defects.map((item) => <option key={item.name}>{item.name}</option>)}</select></label>
+          <div className="decision-intro"><span className="eyebrow">DECISÃO PELA NORMA</span><h3>Pode liberar ou não?</h3><p>Para defeitos visuais, informe a aparência e a quantidade. Para os mensuráveis, escolha a faixa simples de milímetros.</p></div>
+          <label>Defeito<select value={selectedDefect} onChange={(event) => setSelectedDefect(event.target.value)}>{defects.map((item) => <option key={item.name}>{item.name}</option>)}</select></label>
           <label>Classe da superfície<select value={selectedSurfaceClass} onChange={(event) => setSelectedSurfaceClass(event.target.value)}>{surfaceClasses.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select></label>
-          {defectCriterion.type === 'Mensurável' ? <label>{measurementScale.label} (mm)<input type="number" min="0" step="0.1" value={measurementValue} onChange={(event) => setMeasurementValue(event.target.value)} placeholder="Informe a medida" /></label> : <label>Visibilidade<select value={selectedVisibility} onChange={(event) => setSelectedVisibility(event.target.value)}>{visibilityLevels.map((item) => <option key={item.id} value={item.id}>{item.code} · {item.label}</option>)}</select></label>}
+          {defectCriterion.type === 'Mensurável' ? <label>{measurementScale.label}<select value={selectedMeasurementLevel} onChange={(event) => setSelectedMeasurementLevel(event.target.value)}>{measurementScale.levels.map((item) => <option key={item.id} value={item.id}>{item.label} · {item.detail}</option>)}</select></label> : <label>Visibilidade<select value={selectedVisibility} onChange={(event) => setSelectedVisibility(event.target.value)}>{visibilityLevels.map((item) => <option key={item.id} value={item.id}>{item.code} · {item.label}</option>)}</select></label>}
           <label>Quantidade de defeitos<select value={selectedQuantity} onChange={(event) => setSelectedQuantity(event.target.value)}>{quantityLevels.map((item) => <option key={item.id} value={item.id}>{item.label} · {item.detail}</option>)}</select></label>
           {defectCriterion.type === 'Visual' || defectCriterion.type === 'Mensurável' ? <label className="transfer-choice"><input type="checkbox" checked={noHigherDefects} onChange={(event) => setNoHigherDefects(event.target.checked)} /> Não há defeitos em grupos mais altos na área</label> : null}
           <div className={`outcome outcome-${outcome}`}><Status value={outcome} /><strong>{outcomeText}</strong><span>{selectedDefect} · Classe {selectedSurfaceClass}</span></div>
-          <div className={`criterion-note criterion-${defectCriterion.type.toLowerCase()}`}><span>{matchingGroups?.length ? `GRUPO ${matchingGroups.join('/')}` : defectCriterion.type}</span><strong>{defectCriterion.reference}</strong><p>{outcomeDetail}{transferDetail}</p></div>
+          <div className={`criterion-note criterion-${defectCriterion.type.toLowerCase()}`}><span>{matchingGroups?.length ? `GRUPO ${matchingGroups.join('/')}` : defectCriterion.type}</span><strong>{defectCriterion.reference}</strong><p>{measurementLevel ? `${measurementLevel.label}: ${measurementLevel.detail}. ` : ''}{outcomeDetail}{transferDetail}</p></div>
         </div>
-        <p className="fine-print">Quantidade simplificada: quase nada = 1 defeito; pouco = 2 a 3 defeitos e o cálculo usa 3; bastante = 4 ou mais e o cálculo usa 4. Baseado na STD 120-0014: a classe 1 e a classe 2 possuem níveis A e B. Os limites valem para a área avaliada de 0,5–1 m². Em áreas menores, também se aplicam os limites de no máximo dois defeitos em 300 mm para 1A/1B e três para 2A/2B. A transferência de quantidade só vale quando não existem defeitos em grupos mais altos na mesma área.</p>
+        <p className="fine-print">Quantidade simplificada: quase nada = 1 defeito; pouco = 2 a 3 defeitos e o cálculo usa 3; bastante = 4 ou mais e o cálculo usa 4. Para milímetros, as três faixas são adaptadas a cada tipo de defeito conforme a tabela da STD 120-0014. Os limites valem para a área avaliada de 0,5–1 m². Em áreas menores, também se aplicam os limites de no máximo dois defeitos em 300 mm para 1A/1B e três para 2A/2B. A transferência de quantidade só vale quando não existem defeitos em grupos mais altos na mesma área.</p>
         <FooterRule />
       </section>
 
