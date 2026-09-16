@@ -1,3 +1,4 @@
+/* Camada de interação: comportamento dos slides, animações, correções responsivas e toque no celular. */
 html, body, #root, main { width: 100%; height: 100%; overflow: hidden; }
 html { scroll-snap-type: none; scroll-padding-top: 0; }
 body { overscroll-behavior: none; }
@@ -153,7 +154,7 @@ body { overscroll-behavior: none; }
 .matrix-wrap .matrix-visual-row strong { font-size: 9px; text-transform: uppercase; }
 .matrix-wrap .matrix-visual-row.muito strong { color: var(--red); }
 
-/* Softer surfaces inspired by the monitoring dashboard while preserving the guide palette. */
+/* Superfícies mais suaves inspiradas no painel de monitoramento, preservando a paleta do guia. */
 .topbar { border-bottom: 1px solid rgba(255,255,255,.09); box-shadow: 0 10px 30px rgba(0,0,0,.16); }
 .primary-button, .checklist-toggle, .floating-controls button { border-radius: 12px; }
 .critical-note, .warning-band, .area-rule, .attention-message { border-radius: 18px; }

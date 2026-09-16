@@ -1,4 +1,6 @@
+// Hooks do React que controlam navegação, consulta, galerias e interações por toque.
 import { useEffect, useMemo, useRef, useState } from 'react';
+// Ícones usados na navegação, nos indicadores de status e nos cartões de inspeção.
 import {
   AlertTriangle,
   ArrowDown,
@@ -23,6 +25,7 @@ import {
   ZoomIn,
 } from 'lucide-react';
 
+// Classes visuais exibidas no slide “Classificação das superfícies” e suas imagens na máquina.
 const classes = [
   { id: '1', label: 'Muito alta', detail: 'Visível no campo imediato de visão do observador.', example: 'Frente, painéis principais, regiões externas críticas', image: new URL('../img/classes/classe 1/classs1.png', import.meta.url).href, imageAlt: 'Área externa visível da máquina indicada em vermelho' },
   { id: '2', label: 'Média', detail: 'Visível, porém afastada do campo imediato de visão.', example: 'Áreas visíveis secundárias ou de observação eventual', image: new URL('../img/classes/classe2/class2.png', import.meta.url).href, imageAlt: 'Área lateral da máquina indicada em vermelho' },
@@ -30,6 +33,8 @@ const classes = [
   { id: '4', label: 'Oculta', detail: 'Permanentemente oculta após montagem.', example: 'Áreas internas cobertas ou escondidas', image: null, imageAlt: null },
 ];
 
+// Limites oficiais da STD 120-0014 para cada classe de superfície e grupo de defeito A–F.
+// Um limite nulo indica que a classe 4 não possui limite visual após a montagem final.
 const surfaceClasses = [
   { id: '1A', label: '1A · máxima exigência', limits: { A: 3, B: 0, C: 0, D: 0, E: 0, F: 0 } },
   { id: '1B', label: '1B · alta exigência', limits: { A: 3, B: 2, C: 0, D: 0, E: 0, F: 0 } },
@@ -39,6 +44,8 @@ const surfaceClasses = [
   { id: '4', label: '4 · oculta após montagem', limits: null },
 ];
 
+// Catálogo de defeitos: identifica a norma aplicável, se o defeito é visual ou mensurável
+// e os grupos associados a cada nível de visibilidade.
 const defects = [
   { name: 'Escorrido de tinta', type: 'Mensurável', reference: 'STD 120-0014 · escorridos e gotas', measurement: 'run' },
   { name: 'Sujeira', type: 'Mensurável', reference: 'STD 120-0014 · sujeira e fibras', measurement: 'dirt' },
@@ -56,6 +63,7 @@ const defects = [
   { name: 'Desplacamento', type: 'Processo', reference: 'IT 177 · aderência e proteção', policy: 'block' },
 ];
 
+// Três escolhas visuais simples para o inspetor, associadas à escala Volvo I–III.
 const visibilityLevels = [
   {
     id: 'pouco',
@@ -80,12 +88,14 @@ const visibilityLevels = [
   },
 ];
 
+// Filtro simples de quantidade. O maior número de cada faixa é usado para um resultado seguro.
 const quantityLevels = [
   { id: 'quase-nada', label: 'Quase nada', count: 1, detail: '1 defeito' },
   { id: 'pouco', label: 'Pouco', count: 3, detail: '2 a 3 defeitos' },
   { id: 'bastante', label: 'Bastante', count: 4, detail: '4 ou mais defeitos' },
 ];
 
+// Faixas simples em milímetros para defeitos mensuráveis, preservando os grupos A–F da norma.
 const measurementScales = {
   dirt: {
     label: 'Tamanho da partícula',
@@ -113,8 +123,11 @@ const measurementScales = {
   },
 };
 
+// Lista ordenada usada ao somar a capacidade não usada de defeitos mais visíveis.
 const defectGroups = ['A', 'B', 'C', 'D', 'E', 'F'];
 
+// Retorna a quantidade permitida para um grupo. Com a caixa marcada, limites não usados
+// de defeitos mais visíveis podem ser somados, conforme descrito na STD 120-0014.
 function groupLimit(surfaceClass, group, canTransfer) {
   if (!surfaceClass.limits) return Infinity;
   const start = defectGroups.indexOf(group);
@@ -122,6 +135,7 @@ function groupLimit(surfaceClass, group, canTransfer) {
   return defectGroups.slice(start).reduce((total, item) => total + surfaceClass.limits[item], 0);
 }
 
+// Fonte única dos rótulos e ícones usados na navegação dos slides.
 const nav = [
   { label: 'Início', Icon: ShieldCheck },
   { label: 'Fluxo', Icon: GitBranch },
@@ -132,6 +146,7 @@ const nav = [
   { label: 'Exemplos', Icon: ImageOff },
 ];
 
+// Galerias de fotos exibidas no slide final. Cada item tem uma capa e todos os exemplos disponíveis.
 const defectGalleries = [
   {
     label: 'Contaminação',
@@ -190,6 +205,7 @@ const defectGalleries = [
   },
 ];
 
+// Renderiza o ícone de status usado na matriz e no resultado da decisão.
 function Status({ value }) {
   const status = {
     '✓': { label: 'Pode liberar', Icon: Check },
@@ -201,6 +217,7 @@ function Status({ value }) {
   return <span className={`status status-${value}`} title={status.label} aria-label={status.label}><Icon size={15} strokeWidth={3} /></span>;
 }
 
+// Cabeçalho reutilizável no início de cada seção da apresentação.
 function SectionHeader({ eyebrow, title, text }) {
   return <header className="section-header">
     <span className="eyebrow">{eyebrow}</span>
@@ -209,50 +226,60 @@ function SectionHeader({ eyebrow, title, text }) {
   </header>;
 }
 
+// Lembrete reutilizável que mantém a referência aos documentos técnicos em todos os slides.
 function FooterRule() {
   return <p className="footer-rule">QUALIDADE É CONFORMIDADE <span>•</span> CONSULTE SEMPRE O DESENHO TÉCNICO E A INSTRUÇÃO APLICÁVEL</p>;
 }
 
+// Apresentação principal: concentra os estados de interação e renderiza as sete seções do guia.
 function App() {
+  // Estado da navegação e da prévia de imagem das classes.
   const [active, setActive] = useState(0);
   const [selectedClass, setSelectedClass] = useState('1');
   const [hoveredClass, setHoveredClass] = useState(null);
   const [classPreviewPosition, setClassPreviewPosition] = useState({ x: 0, y: 0 });
   const classHoverTimer = useRef(null);
   const touchStart = useRef(null);
+  // Estado da ferramenta de decisão baseada nas normas.
   const [selectedDefect, setSelectedDefect] = useState('Escorrido de tinta');
   const [selectedSurfaceClass, setSelectedSurfaceClass] = useState('1A');
   const [selectedVisibility, setSelectedVisibility] = useState('pouco');
   const [selectedMeasurementLevel, setSelectedMeasurementLevel] = useState('quase-nada');
   const [selectedQuantity, setSelectedQuantity] = useState('quase-nada');
   const [noHigherDefects, setNoHigherDefects] = useState(false);
+  // Estado do checklist opcional e da galeria de fotos dos defeitos.
   const [showChecklist, setShowChecklist] = useState(false);
   const [openGallery, setOpenGallery] = useState(null);
   const [expandedGalleryImage, setExpandedGalleryImage] = useState(null);
   const sections = useMemo(() => ['inicio', 'fluxo', 'condicoes', 'classes', 'matriz', 'atencao', 'exemplos'], []);
 
+  // Troca de seção mantendo a navegação entre o primeiro e o último slide.
   const go = (index) => {
     const next = Math.max(0, Math.min(sections.length - 1, index));
     setActive(next);
   };
 
+  // Abre a imagem da classe selecionada após um pequeno tempo de espera no mouse.
   const startClassPreview = (id, event) => {
     setClassPreviewPosition({ x: event.clientX, y: event.clientY });
     window.clearTimeout(classHoverTimer.current);
     classHoverTimer.current = window.setTimeout(() => setHoveredClass(id), 550);
   };
 
+  // Cancela a prévia pendente e fecha uma imagem de classe já aberta.
   const stopClassPreview = () => {
     window.clearTimeout(classHoverTimer.current);
     setHoveredClass(null);
   };
 
+  // Guarda o início do toque. Galerias ignoram o deslize para preservar a interação com as fotos.
   const startSwipe = (event) => {
     if (openGallery) return;
     const touch = event.touches[0];
     touchStart.current = { x: touch.clientX, y: touch.clientY };
   };
 
+  // Troca o slide somente em um deslize horizontal intencional; a rolagem vertical é preservada.
   const finishSwipe = (event) => {
     if (!touchStart.current || openGallery) return;
     const touch = event.changedTouches[0];
@@ -263,6 +290,7 @@ function App() {
     go(deltaX < 0 ? active + 1 : active - 1);
   };
 
+  // Ativa a navegação por teclado e a tecla Esc para fechar uma galeria aberta.
   useEffect(() => {
     const onKey = (event) => {
       if (['INPUT', 'SELECT', 'TEXTAREA'].includes(event.target.tagName)) return;
@@ -277,8 +305,10 @@ function App() {
     return () => window.removeEventListener('keydown', onKey);
   }, [active, openGallery]);
 
+  // Evita que um temporizador de hover continue após o componente ser removido.
   useEffect(() => () => window.clearTimeout(classHoverTimer.current), []);
 
+  // Transforma as escolhas do inspetor nos dados atuais de defeito, classe e grupo da norma.
   const defectCriterion = defects.find((item) => item.name === selectedDefect) ?? defects[0];
   const visibility = visibilityLevels.find((item) => item.id === selectedVisibility) ?? visibilityLevels[0];
   const measurementScale = measurementScales[defectCriterion.measurement];
@@ -291,6 +321,8 @@ function App() {
     : defectCriterion.visual?.[selectedVisibility] ?? null;
   const allowedGroups = matchingGroups?.filter((group) => groupLimit(selectedStandardClass, group, noHigherDefects) >= count) ?? [];
   const blockedGroups = matchingGroups?.filter((group) => !allowedGroups.includes(group)) ?? [];
+  // Aplica a decisão de liberação por prioridade: bloqueio de processo, consulta externa,
+  // aparência inválida, classe 4, limite excedido, grupo condicionado ou liberação direta.
   let outcome = '!';
   let outcomeText = 'Avaliação necessária';
   let outcomeDetail = '';
@@ -324,6 +356,7 @@ function App() {
     outcomeText = 'Pode liberar';
     outcomeDetail = `${count} ocorrência${count > 1 ? 's' : ''} no${matchingGroups.length > 1 ? 's' : ''} grupo${matchingGroups.length > 1 ? 's' : ''} ${matchingGroups.join('/')} ${matchingGroups.length > 1 ? 'estão' : 'está'} dentro do limite da classe ${selectedStandardClass.id}.`;
   }
+  // Explica quando a regra de quantidade adicional foi usada na decisão.
   const transferDetail = noHigherDefects && selectedStandardClass.limits
     ? ' A quantidade adicional foi aplicada porque não há defeitos mais visíveis nesta área.'
     : '';
@@ -335,8 +368,10 @@ function App() {
     top: Math.max(80, Math.min(classPreviewPosition.y + 20, window.innerHeight - 314)),
   } : undefined;
 
+  // Estrutura da apresentação: navegação, sete slides, galeria modal e controles anterior/próximo.
   return (
     <main onTouchStart={startSwipe} onTouchEnd={finishSwipe}>
+      {/* Cabeçalho fixo: marca, navegação de desktop e contador do slide atual. */}
       <nav className="topbar" aria-label="Navegação da apresentação">
         <button className="brand" onClick={() => go(0)} aria-label="Voltar ao início"><span><ShieldCheck size={16} /></span> GUIA DE QUALIDADE</button>
         <div className="nav-links">
@@ -345,10 +380,12 @@ function App() {
         <span className="slide-counter">{String(active + 1).padStart(2, '0')} / 07</span>
       </nav>
 
+      {/* Navegação lateral compacta disponível em desktop e celular. */}
       <aside className="slide-rail" aria-label="Paginação lateral">
         {nav.map(({ label, Icon }, index) => <button key={label} className={active === index ? 'active' : ''} onClick={() => go(index)} aria-label={`Ir para ${label}`}><span>{String(index + 1).padStart(2, '0')}</span><i /><Icon size={15} /></button>)}
       </aside>
 
+      {/* Slide 1: introdução e entrada do guia. */}
       <section id="inicio" className={`hero presentation-section ${active === 0 ? 'section-active' : ''}`}>
         <div className="hero-photo" role="img" aria-label="Equipamento Volvo amarelo em campo" />
         <div className="hero-overlay" />
@@ -362,6 +399,7 @@ function App() {
         <FooterRule />
       </section>
 
+      {/* Slide 2: fluxo de inspeção e lembretes obrigatórios para decisão. */}
       <section id="fluxo" className={`presentation-section flow-section ${active === 1 ? 'section-active' : ''}`}>
         <SectionHeader eyebrow="ITS" title="Fluxo integrado de inspeção" text="Como decidir usando as duas normas" />
         <div className="flow-layout">
@@ -376,6 +414,7 @@ function App() {
         <FooterRule />
       </section>
 
+      {/* Slide 3: condições controladas de avaliação presentes nas instruções de trabalho. */}
       <section id="condicoes" className={`presentation-section conditions-section ${active === 2 ? 'section-active' : ''}`}>
         <SectionHeader eyebrow="ITS 176 + ITS 177" title="Condições padrão de avaliação" text="A inspeção visual depende de condições controladas." />
         <div className="conditions-layout">
@@ -394,6 +433,7 @@ function App() {
         <FooterRule />
       </section>
 
+      {/* Slide 4: classes de superfície com prévia por hover ou segundo toque. */}
       <section id="classes" className={`presentation-section classes-section ${active === 3 ? 'section-active' : ''}`}>
         <SectionHeader eyebrow="02" title="Classificação das superfícies" text="Passe o mouse sobre uma classe para ver onde a peça fica na máquina." />
         <div className="class-scale" aria-label="Escala de exigência estética">
@@ -406,6 +446,7 @@ function App() {
         <FooterRule />
       </section>
 
+      {/* Slide 5: matriz da STD 120-0014 e decisão de liberação interativa. */}
       <section id="matriz" className={`presentation-section matrix-section ${active === 4 ? 'section-active' : ''}`}>
         <SectionHeader eyebrow="02.2" title="Defeitos e classes" text="A norma cruza aparência, grupo A–F, classe da superfície e quantidade. Escolha o defeito para consultar a regra correta." />
         <div className="matrix-wrap"><table><thead><tr><th>DEFEITO</th><th>TIPO</th><th>I · PRATICAMENTE INVISÍVEL</th><th>II · POUCO VISÍVEL</th><th>III · CLARAMENTE VISÍVEL</th></tr></thead><tbody>{defects.map((item) => <tr key={item.name} className={selectedDefect === item.name ? 'chosen' : ''} onClick={() => setSelectedDefect(item.name)}><th>{item.name}</th><td>{item.type}</td>{item.type === 'Visual' ? <><td>{item.visual.pouco.length ? item.visual.pouco.join('/') : '—'}</td><td>{item.visual.visivel.length ? item.visual.visivel.join('/') : '—'}</td><td>{item.visual.muito.length ? item.visual.muito.join('/') : '—'}</td></> : <td colSpan="3">{item.type === 'Mensurável' ? 'Medir em mm para enquadrar no grupo A–F' : item.policy === 'block' ? 'Não liberar automaticamente' : 'Comparar com o padrão aprovado'}</td>}</tr>)}</tbody></table></div>
@@ -424,6 +465,7 @@ function App() {
         <FooterRule />
       </section>
 
+      {/* Slide 6: pontos críticos de inspeção e checklist opcional. */}
       <section id="atencao" className={`presentation-section attention-section ${active === 5 ? 'section-active' : ''}`}>
         <SectionHeader eyebrow="03" title="Pontos de atenção" text="Todos os exemplos abaixo são casos de reprova." />
         <div className="attention-grid">
@@ -438,6 +480,7 @@ function App() {
         <FooterRule />
       </section>
 
+      {/* Slide 7: exemplos de defeitos. Selecionar um cartão abre todas as fotos do problema. */}
       <section id="exemplos" className={`presentation-section examples-section ${active === 6 ? 'section-active' : ''}`}>
         <SectionHeader eyebrow="03.2" title="Exemplos de não conformidades" text="Selecione um problema para abrir todas as fotos registradas." />
         <div className="gallery defect-gallery">
@@ -451,6 +494,7 @@ function App() {
         <FooterRule />
       </section>
 
+      {/* Modal que mantém a galeria ampliada separada da navegação de slides. */}
       {openGallery && <div className="gallery-modal" role="dialog" aria-modal="true" aria-label={`Fotos de ${openGallery.label}`}>
         <button className="gallery-modal-backdrop" onClick={() => { setOpenGallery(null); setExpandedGalleryImage(null); }} aria-label="Fechar galeria" />
         <div className="gallery-modal-panel">
@@ -459,6 +503,7 @@ function App() {
         </div>
       </div>}
 
+      {/* Botões de anterior e próximo para a navegação em desktop. */}
       <div className="floating-controls" aria-label="Controles de slide"><button onClick={() => go(active - 1)} disabled={active === 0} aria-label="Seção anterior"><ChevronLeft /></button><button onClick={() => go(active + 1)} disabled={active === sections.length - 1} aria-label="Próxima seção"><ChevronRight /></button></div>
     </main>
   );

@@ -1,3 +1,4 @@
+/* Base visual: tokens, tipografia e layout de desktop de cada seção do guia. */
 @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 
 :root { --yellow:#f7b718; --orange:#ed6a20; --ink:#111416; --ink-2:#252a2d; --paper:#f5f4f0; --muted:#5e676c; --line:rgba(17,20,22,.14); --green:#1f9c65; --red:#d9413a; }
