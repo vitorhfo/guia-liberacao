@@ -325,7 +325,7 @@ function App() {
     outcomeDetail = `${count} ocorrência${count > 1 ? 's' : ''} no${matchingGroups.length > 1 ? 's' : ''} grupo${matchingGroups.length > 1 ? 's' : ''} ${matchingGroups.join('/')} ${matchingGroups.length > 1 ? 'estão' : 'está'} dentro do limite da classe ${selectedStandardClass.id}.`;
   }
   const transferDetail = noHigherDefects && selectedStandardClass.limits
-    ? ' A ampliação de quantidade foi aplicada porque não há defeitos em grupos mais altos na mesma área inspecionada.'
+    ? ' A quantidade adicional foi aplicada porque não há defeitos mais visíveis nesta área.'
     : '';
   const displayClass = classes.find((item) => item.id === selectedClass) ?? classes[0];
   const previewClass = classes.find((item) => item.id === hoveredClass);
@@ -416,11 +416,11 @@ function App() {
           <label>Classe da superfície<select value={selectedSurfaceClass} onChange={(event) => setSelectedSurfaceClass(event.target.value)}>{surfaceClasses.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select></label>
           {defectCriterion.type === 'Mensurável' ? <label>{measurementScale.label}<select value={selectedMeasurementLevel} onChange={(event) => setSelectedMeasurementLevel(event.target.value)}>{measurementScale.levels.map((item) => <option key={item.id} value={item.id}>{item.label} · {item.detail}</option>)}</select></label> : <label>Visibilidade<select value={selectedVisibility} onChange={(event) => setSelectedVisibility(event.target.value)}>{visibilityLevels.map((item) => <option key={item.id} value={item.id}>{item.code} · {item.label}</option>)}</select></label>}
           <label>Quantidade de defeitos<select value={selectedQuantity} onChange={(event) => setSelectedQuantity(event.target.value)}>{quantityLevels.map((item) => <option key={item.id} value={item.id}>{item.label} · {item.detail}</option>)}</select></label>
-          {defectCriterion.type === 'Visual' || defectCriterion.type === 'Mensurável' ? <label className="transfer-choice"><input type="checkbox" checked={noHigherDefects} onChange={(event) => setNoHigherDefects(event.target.checked)} /> Não há defeitos em grupos mais altos na área</label> : null}
+          {defectCriterion.type === 'Visual' || defectCriterion.type === 'Mensurável' ? <label className="transfer-choice"><input type="checkbox" checked={noHigherDefects} onChange={(event) => setNoHigherDefects(event.target.checked)} /> Não há defeitos mais visíveis nesta área</label> : null}
           <div className={`outcome outcome-${outcome}`}><Status value={outcome} /><strong>{outcomeText}</strong><span>{selectedDefect} · Classe {selectedSurfaceClass}</span></div>
           <div className={`criterion-note criterion-${defectCriterion.type.toLowerCase()}`}><span>{matchingGroups?.length ? `GRUPO ${matchingGroups.join('/')}` : defectCriterion.type}</span><strong>{defectCriterion.reference}</strong><p>{measurementLevel ? `${measurementLevel.label}: ${measurementLevel.detail}. ` : ''}{outcomeDetail}{transferDetail}</p></div>
         </div>
-        <p className="fine-print">Quantidade simplificada: quase nada = 1 defeito; pouco = 2 a 3 defeitos e o cálculo usa 3; bastante = 4 ou mais e o cálculo usa 4. Para milímetros, as três faixas são adaptadas a cada tipo de defeito conforme a tabela da STD 120-0014. Os limites valem para a área avaliada de 0,5–1 m². Em áreas menores, também se aplicam os limites de no máximo dois defeitos em 300 mm para 1A/1B e três para 2A/2B. A transferência de quantidade só vale quando não existem defeitos em grupos mais altos na mesma área.</p>
+        <p className="fine-print">Quantidade simplificada: quase nada = 1 defeito; pouco = 2 a 3 defeitos e o cálculo usa 3; bastante = 4 ou mais e o cálculo usa 4. Para milímetros, as três faixas são adaptadas a cada tipo de defeito conforme a tabela da STD 120-0014. Os limites valem para a área avaliada de 0,5–1 m². Em áreas menores, também se aplicam os limites de no máximo dois defeitos em 300 mm para 1A/1B e três para 2A/2B. A quantidade adicional só vale quando não existem defeitos mais visíveis na mesma área.</p>
         <FooterRule />
       </section>
 
