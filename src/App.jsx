@@ -147,8 +147,8 @@ const defectGalleries = [
     label: 'Falha de cobertura',
     images: [
       new URL('../img/defeitos/falhaDeCobertura/IMG-20260720-WA0073.jpeg', import.meta.url).href,
-      new URL('../img/defeitos/falhaDeCobertura/Imagem2-tratada.jpg', import.meta.url).href,
-      new URL('../img/defeitos/falhaDeCobertura/Imagem3-tratada.jpg', import.meta.url).href,
+      new URL('../img/defeitos/falhaDeCobertura/Imagem2-final.jpg', import.meta.url).href,
+      new URL('../img/defeitos/falhaDeCobertura/Imagem3-final.jpg', import.meta.url).href,
     ],
   },
   {
@@ -156,7 +156,7 @@ const defectGalleries = [
     images: [
       new URL('../img/defeitos/desplacamento/Imagem4-tratada.png', import.meta.url).href,
       new URL('../img/defeitos/desplacamento/Imagem5-tratada.png', import.meta.url).href,
-      new URL('../img/defeitos/desplacamento/Imagem6-tratada.jpg', import.meta.url).href,
+      new URL('../img/defeitos/desplacamento/Imagem6-final.jpg', import.meta.url).href,
       new URL('../img/defeitos/desplacamento/Imagem7-tratada.png', import.meta.url).href,
     ],
   },
