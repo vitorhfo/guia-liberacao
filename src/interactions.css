@@ -55,6 +55,11 @@ body { overscroll-behavior: none; }
 @media (max-width: 900px) {
   .slide-rail { right: 14px; }
   .slide-rail button { grid-template-columns: 18px 24px 16px; }
+  .presentation-section.section-active { justify-content:flex-start; overflow-x:hidden; overflow-y:auto; padding-top:92px; padding-bottom:82px; -webkit-overflow-scrolling:touch; }
+  .section-header h2, .section-header p, .class-details h3, .class-details p, .fine-print { overflow-wrap:anywhere; }
+  .class-details { min-height:0; }
+  .class-details article.visible { gap:14px; }
+  .footer-rule { flex:0 0 auto; }
 }
 
 @media (min-width: 601px) {
@@ -198,6 +203,12 @@ body { overscroll-behavior: none; }
   .class-label { font-size:11px; }
   .class-item small { min-height:18px; font-size:7px; }
   .class-details { min-height:0; margin-top:14px; }
+  .section-header h2 { font-size:clamp(36px,11vw,48px); line-height:.95; }
+  .section-header p { font-size:14px; line-height:1.45; }
+  .class-details h3 { font-size:28px; line-height:.95; }
+  .class-details p { font-size:13px; line-height:1.45; }
+  .class-details .example { padding-top:10px; }
+  .footer-rule { margin-top:18px; font-size:8px; line-height:1.4; }
   .defect-gallery-meta { padding:13px; }
   .defect-gallery-meta strong { font-size:23px; }
   .final-call { align-items:flex-start; flex-direction:column; margin-top:22px; }
