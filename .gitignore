@@ -1,3 +1,5 @@
 node_modules/
 dist/
 .vite/
+site-package-stage/
+guia-superficies-pintadas.tar

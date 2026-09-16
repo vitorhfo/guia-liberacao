@@ -1,0 +1,61 @@
+html { scroll-snap-type: y proximity; scroll-padding-top: 72px; }
+
+.brand { display: flex; align-items: center; }
+.brand span { display: inline-grid; place-items: center; font-family: inherit; }
+
+.nav-links { align-self: stretch; align-items: stretch; gap: 10px; }
+.nav-links button { min-width: 66px; display: grid; grid-template-columns: auto auto; grid-template-rows: 1fr 2px; align-items: center; column-gap: 5px; padding: 0 7px; }
+.nav-links button svg { color: #687176; transition: color .2s, transform .2s; }
+.nav-links button i { grid-column: 1 / -1; display: block; width: 0; height: 2px; background: var(--yellow); transition: width .3s ease; }
+.nav-links button:hover, .nav-links button.active { color: #fff; box-shadow: none; }
+.nav-links button:hover svg, .nav-links button.active svg { color: var(--yellow); transform: translateY(-1px); }
+.nav-links button.active i { width: 100%; }
+
+.slide-rail { position: fixed; z-index: 11; top: 50%; right: 22px; display: flex; flex-direction: column; gap: 3px; transform: translateY(-50%); }
+.slide-rail button { display: grid; grid-template-columns: 22px 34px 18px; align-items: center; gap: 5px; min-height: 29px; padding: 0; border: 0; color: #768084; background: transparent; font-size: 10px; font-weight: 800; letter-spacing: .04em; }
+.slide-rail button i { display: block; height: 1px; background: #8c969a; transition: height .25s, background .25s; }
+.slide-rail button svg { opacity: 0; transform: translateX(6px); transition: opacity .2s, transform .2s, color .2s; }
+.slide-rail button.active { color: var(--yellow); }
+.slide-rail button.active i { height: 3px; background: var(--yellow); }
+.slide-rail button.active svg { opacity: 1; transform: translateX(0); color: var(--yellow); }
+
+.presentation-section { scroll-snap-align: start; scroll-snap-stop: always; }
+.section-active .section-header { animation: reveal-up .55s both; }
+.section-active .flow-layout, .section-active .conditions-layout, .section-active .class-scale, .section-active .matrix-wrap, .section-active .attention-grid, .section-active .gallery { animation: reveal-up .68s .08s both; }
+.section-active .warning-band, .section-active .attention-message, .section-active .decision-tool, .section-active .final-call { animation: reveal-up .55s .18s both; }
+.section-active .footer-rule { animation: fade-in .6s .28s both; }
+.hero.section-active .hero-content { animation: reveal-up .72s .1s both; }
+
+.primary-button { display: inline-flex; align-items: center; justify-content: space-between; gap: 20px; }
+.primary-button b { display: none; }
+.primary-button svg { transition: transform .2s; }
+.primary-button:hover svg { transform: translateY(3px); }
+.critical-note > svg { flex: 0 0 auto; color: var(--yellow); }
+.critical-note > span { display: none; }
+.condition-list b { display: grid; place-items: center; width: 38px; height: 38px; font-family: inherit; }
+.status { font-size: 0; font-weight: 400; }
+.card-icon { margin-bottom: auto; color: var(--orange); }
+.gallery figcaption span { vertical-align: middle; }
+.floating-controls button { display: grid; place-items: center; font-size: 0; }
+
+@keyframes reveal-up { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; scroll-snap-type: none; }
+  .section-active .section-header, .section-active .flow-layout, .section-active .conditions-layout, .section-active .class-scale, .section-active .matrix-wrap, .section-active .attention-grid, .section-active .gallery, .section-active .warning-band, .section-active .attention-message, .section-active .decision-tool, .section-active .final-call, .section-active .footer-rule, .hero.section-active .hero-content { animation: none; }
+  * { transition-duration: .01ms !important; }
+}
+
+@media (max-width: 900px) {
+  .slide-rail { right: 14px; }
+  .slide-rail button { grid-template-columns: 18px 24px 16px; }
+}
+
+@media (max-width: 600px) {
+  html { scroll-padding-top: 60px; }
+  .presentation-section { padding-right: 48px; }
+  .slide-rail { top: auto; right: 14px; bottom: 64px; gap: 0; padding: 5px; transform: none; background: rgba(17,20,22,.86); box-shadow: 0 8px 24px rgba(0,0,0,.18); }
+  .slide-rail button { grid-template-columns: 15px 16px; min-height: 23px; }
+  .slide-rail button svg { display: none; }
+}
