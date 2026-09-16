@@ -126,6 +126,7 @@ function App() {
   const [active, setActive] = useState(0);
   const [selectedClass, setSelectedClass] = useState('1');
   const [hoveredClass, setHoveredClass] = useState(null);
+  const [classPreviewPosition, setClassPreviewPosition] = useState({ x: 0, y: 0 });
   const classHoverTimer = useRef(null);
   const [selectedDefect, setSelectedDefect] = useState('Escorrido de tinta');
   const [showChecklist, setShowChecklist] = useState(false);
@@ -137,7 +138,8 @@ function App() {
     setActive(next);
   };
 
-  const startClassPreview = (id) => {
+  const startClassPreview = (id, event) => {
+    setClassPreviewPosition({ x: event.clientX, y: event.clientY });
     window.clearTimeout(classHoverTimer.current);
     classHoverTimer.current = window.setTimeout(() => setHoveredClass(id), 550);
   };
@@ -166,7 +168,13 @@ function App() {
   const row = defects.find(([name]) => name === selectedDefect);
   const outcome = row?.[1][Number(selectedClass) - 1] ?? '—';
   const outcomeText = { '✓': 'Pode liberar', '!': 'Avaliar', '✕': 'Reprovar', '—': 'Consultar a norma' }[outcome];
-  const displayClass = classes.find((item) => item.id === (hoveredClass ?? selectedClass)) ?? classes[0];
+  const displayClass = classes.find((item) => item.id === selectedClass) ?? classes[0];
+  const previewClass = classes.find((item) => item.id === hoveredClass);
+  const previewStyle = previewClass ? {
+    '--class-color': `var(--class-${previewClass.id})`,
+    left: Math.max(16, Math.min(classPreviewPosition.x + 20, window.innerWidth - 336)),
+    top: Math.max(80, Math.min(classPreviewPosition.y + 20, window.innerHeight - 314)),
+  } : undefined;
 
   return (
     <main>
@@ -230,11 +238,12 @@ function App() {
       <section id="classes" className={`presentation-section classes-section ${active === 3 ? 'section-active' : ''}`}>
         <SectionHeader eyebrow="02" title="Classificação das superfícies" text="Passe o mouse sobre uma classe para ver onde a peça fica na máquina." />
         <div className="class-scale" aria-label="Escala de exigência estética">
-          {classes.map((item, index) => <button key={item.id} className={`class-item class-${item.id} ${selectedClass === item.id ? 'selected' : ''}`} onClick={() => setSelectedClass(item.id)} onPointerDown={(event) => { if (event.pointerType !== 'mouse') setHoveredClass(item.id); }} onMouseEnter={() => startClassPreview(item.id)} onMouseLeave={stopClassPreview} onBlur={stopClassPreview}><span className="class-number">{item.id}</span><span className="class-label">{item.label}</span><small>{index === 0 ? 'MAIOR EXIGÊNCIA ESTÉTICA' : index === 3 ? 'MENOR EXIGÊNCIA ESTÉTICA' : ''}</small></button>)}
+          {classes.map((item, index) => <button key={item.id} className={`class-item class-${item.id} ${selectedClass === item.id ? 'selected' : ''}`} onClick={() => setSelectedClass(item.id)} onPointerDown={(event) => { if (event.pointerType !== 'mouse') { setClassPreviewPosition({ x: event.clientX, y: event.clientY }); setHoveredClass(item.id); } }} onMouseEnter={(event) => startClassPreview(item.id, event)} onMouseMove={(event) => setClassPreviewPosition({ x: event.clientX, y: event.clientY })} onMouseLeave={stopClassPreview} onBlur={stopClassPreview}><span className="class-number">{item.id}</span><span className="class-label">{item.label}</span><small>{index === 0 ? 'MAIOR EXIGÊNCIA ESTÉTICA' : index === 3 ? 'MENOR EXIGÊNCIA ESTÉTICA' : ''}</small></button>)}
         </div>
         <div className="class-details">
-          <article className={`visible class-detail-${displayClass.id}`} style={{ '--class-color': `var(--class-${displayClass.id})` }}><span>CLASSE {displayClass.id}</span><h3>{displayClass.label}</h3><p>{displayClass.detail}</p><p className="example"><b>Exemplo de aplicação</b>{displayClass.example}</p><figure className={`class-photo ${hoveredClass ? 'is-previewing' : ''}`}>{hoveredClass && displayClass.image ? <img src={displayClass.image} alt={displayClass.imageAlt} /> : <div><Eye size={28} /><span>{displayClass.image ? 'Mantenha o mouse sobre uma classe' : 'Oculta após montagem'}</span></div>}<figcaption>{hoveredClass && displayClass.image ? 'Local de aplicação na máquina' : displayClass.image ? 'Foto exibida ao passar o mouse' : 'Sem avaliação estética após a montagem'}</figcaption></figure></article>
+          <article className={`visible class-detail-${displayClass.id}`} style={{ '--class-color': `var(--class-${displayClass.id})` }}><span>CLASSE {displayClass.id}</span><h3>{displayClass.label}</h3><p>{displayClass.detail}</p><p className="example"><b>Exemplo de aplicação</b>{displayClass.example}</p><figure className="class-photo"><div><Eye size={28} /><span>{displayClass.image ? 'Mantenha o mouse sobre uma classe' : 'Oculta após montagem'}</span></div><figcaption>{displayClass.image ? 'Foto exibida junto ao cursor' : 'Sem avaliação estética após a montagem'}</figcaption></figure></article>
         </div>
+        {previewClass && <aside className="class-hover-popup" style={previewStyle}><div className="class-hover-popup-title"><span>CLASSE {previewClass.id}</span><strong>{previewClass.label}</strong></div>{previewClass.image ? <img src={previewClass.image} alt={previewClass.imageAlt} /> : <div className="class-hover-popup-hidden"><Eye size={34} /><span>Oculta após a montagem</span></div>}<p>{previewClass.image ? 'Local da peça indicado na máquina.' : 'Esta região não fica visível após a montagem.'}</p></aside>}
         <FooterRule />
       </section>
 
