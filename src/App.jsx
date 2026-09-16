@@ -220,6 +220,7 @@ function App() {
   const [hoveredClass, setHoveredClass] = useState(null);
   const [classPreviewPosition, setClassPreviewPosition] = useState({ x: 0, y: 0 });
   const classHoverTimer = useRef(null);
+  const touchStart = useRef(null);
   const [selectedDefect, setSelectedDefect] = useState('Escorrido de tinta');
   const [selectedVisibility, setSelectedVisibility] = useState('pouco');
   const [showChecklist, setShowChecklist] = useState(false);
@@ -241,6 +242,22 @@ function App() {
   const stopClassPreview = () => {
     window.clearTimeout(classHoverTimer.current);
     setHoveredClass(null);
+  };
+
+  const startSwipe = (event) => {
+    if (openGallery) return;
+    const touch = event.touches[0];
+    touchStart.current = { x: touch.clientX, y: touch.clientY };
+  };
+
+  const finishSwipe = (event) => {
+    if (!touchStart.current || openGallery) return;
+    const touch = event.changedTouches[0];
+    const deltaX = touch.clientX - touchStart.current.x;
+    const deltaY = touch.clientY - touchStart.current.y;
+    touchStart.current = null;
+    if (Math.abs(deltaX) < 58 || Math.abs(deltaX) <= Math.abs(deltaY)) return;
+    go(deltaX < 0 ? active + 1 : active - 1);
   };
 
   useEffect(() => {
@@ -280,7 +297,7 @@ function App() {
   } : undefined;
 
   return (
-    <main>
+    <main onTouchStart={startSwipe} onTouchEnd={finishSwipe}>
       <nav className="topbar" aria-label="Navegação da apresentação">
         <button className="brand" onClick={() => go(0)} aria-label="Voltar ao início"><span><ShieldCheck size={16} /></span> GUIA DE QUALIDADE</button>
         <div className="nav-links">
@@ -341,7 +358,7 @@ function App() {
       <section id="classes" className={`presentation-section classes-section ${active === 3 ? 'section-active' : ''}`}>
         <SectionHeader eyebrow="02" title="Classificação das superfícies" text="Passe o mouse sobre uma classe para ver onde a peça fica na máquina." />
         <div className="class-scale" aria-label="Escala de exigência estética">
-          {classes.map((item, index) => <button key={item.id} className={`class-item class-${item.id} ${selectedClass === item.id ? 'selected' : ''}`} onClick={(event) => { setSelectedClass(item.id); startClassPreview(item.id, event); }} onPointerDown={(event) => { if (event.pointerType !== 'mouse') { setClassPreviewPosition({ x: event.clientX, y: event.clientY }); setHoveredClass(item.id); } }} onMouseEnter={(event) => { if (item.id === selectedClass) startClassPreview(item.id, event); }} onMouseMove={(event) => { if (item.id === selectedClass) setClassPreviewPosition({ x: event.clientX, y: event.clientY }); }} onMouseLeave={stopClassPreview} onBlur={stopClassPreview}><span className="class-number">{item.id}</span><span className="class-label">{item.label}</span><small>{index === 0 ? 'MAIOR EXIGÊNCIA ESTÉTICA' : index === 3 ? 'MENOR EXIGÊNCIA ESTÉTICA' : ''}</small></button>)}
+          {classes.map((item, index) => <button key={item.id} className={`class-item class-${item.id} ${selectedClass === item.id ? 'selected' : ''}`} onClick={(event) => { setClassPreviewPosition({ x: event.clientX, y: event.clientY }); if (selectedClass === item.id) setHoveredClass(item.id); else { setSelectedClass(item.id); setHoveredClass(null); } }} onPointerDown={(event) => { if (event.pointerType !== 'mouse') setClassPreviewPosition({ x: event.clientX, y: event.clientY }); }} onMouseEnter={(event) => { if (item.id === selectedClass) startClassPreview(item.id, event); }} onMouseMove={(event) => { if (item.id === selectedClass) setClassPreviewPosition({ x: event.clientX, y: event.clientY }); }} onMouseLeave={stopClassPreview} onBlur={stopClassPreview}><span className="class-number">{item.id}</span><span className="class-label">{item.label}</span><small>{index === 0 ? 'MAIOR EXIGÊNCIA ESTÉTICA' : index === 3 ? 'MENOR EXIGÊNCIA ESTÉTICA' : ''}</small></button>)}
         </div>
         <div className="class-details">
           <article className={`visible class-detail-${displayClass.id}`} style={{ '--class-color': `var(--class-${displayClass.id})` }}><span>CLASSE {displayClass.id}</span><h3>{displayClass.label}</h3><p>{displayClass.detail}</p><p className="example"><b>Exemplo de aplicação</b>{displayClass.example}</p></article>
