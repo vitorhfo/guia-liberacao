@@ -146,6 +146,12 @@ const nav = [
   { label: 'Exemplos', Icon: ImageOff },
 ];
 
+// Direções das partículas verdes usadas na reação de liberação.
+const releaseParticles = Array.from({ length: 12 }, (_, index) => ({
+  angle: `${index * 30}deg`,
+  distance: `${24 + (index % 3) * 8}px`,
+}));
+
 // Galerias de fotos exibidas no slide final. Cada item tem uma capa e todos os exemplos disponíveis.
 const defectGalleries = [
   {
@@ -215,6 +221,18 @@ function Status({ value }) {
   }[value];
   const Icon = status.Icon;
   return <span className={`status status-${value}`} title={status.label} aria-label={status.label}><Icon size={15} strokeWidth={3} /></span>;
+}
+
+// Mostra uma reação visual curta para cada tipo de resultado da consulta.
+// Verde explode como fogos; vermelho cai como lágrimas; amarelo pulsa enquanto exige avaliação.
+function OutcomeReaction({ outcome }) {
+  if (outcome === '✓') {
+    return <span className="outcome-reaction reaction-release" aria-hidden="true">{releaseParticles.map((particle, index) => <i key={index} style={{ '--angle': particle.angle, '--distance': particle.distance }} />)}</span>;
+  }
+  if (outcome === '✕') {
+    return <span className="outcome-reaction reaction-reject" aria-hidden="true"><i /><i /><i /></span>;
+  }
+  return <span className="outcome-reaction reaction-review" aria-hidden="true"><i /><i /></span>;
 }
 
 // Cabeçalho reutilizável no início de cada seção da apresentação.
@@ -458,7 +476,7 @@ function App() {
           {defectCriterion.type === 'Mensurável' ? <label>{measurementScale.label}<select value={selectedMeasurementLevel} onChange={(event) => setSelectedMeasurementLevel(event.target.value)}>{measurementScale.levels.map((item) => <option key={item.id} value={item.id}>{item.label} · {item.detail}</option>)}</select></label> : <label>Visibilidade<select value={selectedVisibility} onChange={(event) => setSelectedVisibility(event.target.value)}>{visibilityLevels.map((item) => <option key={item.id} value={item.id}>{item.code} · {item.label}</option>)}</select></label>}
           <label>Quantidade de defeitos<select value={selectedQuantity} onChange={(event) => setSelectedQuantity(event.target.value)}>{quantityLevels.map((item) => <option key={item.id} value={item.id}>{item.label} · {item.detail}</option>)}</select></label>
           {defectCriterion.type === 'Visual' || defectCriterion.type === 'Mensurável' ? <label className="transfer-choice"><input type="checkbox" checked={noHigherDefects} onChange={(event) => setNoHigherDefects(event.target.checked)} /> Não há defeitos mais visíveis nesta área</label> : null}
-          <div className={`outcome outcome-${outcome}`}><Status value={outcome} /><strong>{outcomeText}</strong><span>{selectedDefect} · Classe {selectedSurfaceClass}</span></div>
+          <div className={`outcome outcome-${outcome}`}><Status value={outcome} /><strong>{outcomeText}</strong><span className="outcome-context">{selectedDefect} · Classe {selectedSurfaceClass}</span><OutcomeReaction key={`${outcome}-${selectedDefect}-${selectedSurfaceClass}-${selectedQuantity}-${selectedMeasurementLevel}-${selectedVisibility}`} outcome={outcome} /></div>
           <div className={`criterion-note criterion-${defectCriterion.type.toLowerCase()}`}><span>{matchingGroups?.length ? `GRUPO ${matchingGroups.join('/')}` : defectCriterion.type}</span><strong>{defectCriterion.reference}</strong><p>{measurementLevel ? `${measurementLevel.label}: ${measurementLevel.detail}. ` : ''}{outcomeDetail}{transferDetail}</p></div>
         </div>
         <p className="fine-print">Quantidade simplificada: quase nada = 1 defeito; pouco = 2 a 3 defeitos e o cálculo usa 3; bastante = 4 ou mais e o cálculo usa 4. Para milímetros, as três faixas são adaptadas a cada tipo de defeito conforme a tabela da STD 120-0014. Os limites valem para a área avaliada de 0,5–1 m². Em áreas menores, também se aplicam os limites de no máximo dois defeitos em 300 mm para 1A/1B e três para 2A/2B. A quantidade adicional só vale quando não existem defeitos mais visíveis na mesma área.</p>
