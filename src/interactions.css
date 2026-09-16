@@ -183,7 +183,7 @@ body { overscroll-behavior: none; }
 .outcome-context { grid-column:2; color:#c4cbcd; font-size:10px; }
 .outcome-reaction { position:absolute; top:50%; right:-28px; width:48px; height:48px; pointer-events:none; transform:translateY(-50%); }
 .reaction-release { right:-34px; }
-.reaction-release i { position:absolute; top:22px; left:22px; width:7px; height:7px; border-radius:50%; background:#46df91; box-shadow:0 0 9px rgba(70,223,145,.9); animation:release-burst .9s cubic-bezier(.16,.76,.35,1) both; transform:rotate(var(--angle)) translateX(0); }
+.reaction-release i { position:absolute; top:22px; left:22px; width:7px; height:7px; border-radius:50%; background:#46df91; box-shadow:0 0 9px rgba(70,223,145,.9); animation:release-burst 4.2s cubic-bezier(.16,.76,.35,1) infinite; transform:rotate(var(--angle)) translateX(0); }
 .reaction-release i:nth-child(3n) { width:5px; height:5px; background:#c8ff6f; }
 .reaction-release i:nth-child(2n) { animation-delay:.07s; }
 .reaction-release i:nth-child(4n) { animation-delay:.13s; }
@@ -195,7 +195,8 @@ body { overscroll-behavior: none; }
 .reaction-review { display:grid; place-items:center; }
 .reaction-review i { position:absolute; width:18px; height:18px; border:2px solid #ffd64b; border-radius:50%; animation:review-pulse 1.45s ease-out infinite; }
 .reaction-review i:last-child { animation-delay:.7s; }
-@keyframes release-burst { 0% { opacity:0; transform:rotate(var(--angle)) translateX(0) scale(.25); } 22% { opacity:1; } 100% { opacity:0; transform:rotate(var(--angle)) translateX(var(--distance)) scale(.6); } }
+/* Cada explosão ocupa o início do ciclo; o restante cria uma pausa limpa antes da próxima. */
+@keyframes release-burst { 0% { opacity:0; transform:rotate(var(--angle)) translateX(0) scale(.25); } 5% { opacity:1; } 21% { opacity:0; transform:rotate(var(--angle)) translateX(var(--distance)) scale(.6); } 100% { opacity:0; transform:rotate(var(--angle)) translateX(var(--distance)) scale(.6); } }
 @keyframes red-tear { 0% { opacity:0; transform:translateY(-4px) rotate(45deg) scale(.65); } 25% { opacity:1; } 78% { opacity:1; } 100% { opacity:0; transform:translateY(26px) rotate(45deg) scale(.85); } }
 @keyframes review-pulse { 0% { opacity:.9; transform:scale(.35); } 100% { opacity:0; transform:scale(2.25); } }
 
