@@ -20,6 +20,7 @@ import {
   SunMedium,
   ThermometerSun,
   X,
+  ZoomIn,
 } from 'lucide-react';
 
 const classes = [
@@ -54,6 +55,50 @@ const nav = [
   { label: 'Exemplos', Icon: ImageOff },
 ];
 
+const defectGalleries = [
+  {
+    label: 'Contaminação',
+    images: [
+      new URL('../img/defeitos/contaminacao/IMG-20260627-WA0009.jpg', import.meta.url).href,
+      new URL('../img/defeitos/contaminacao/IMG-20260627-WA0010.jpg', import.meta.url).href,
+      new URL('../img/defeitos/contaminacao/IMG-20260627-WA0011.jpg', import.meta.url).href,
+      new URL('../img/defeitos/contaminacao/IMG-20260627-WA0012.jpg', import.meta.url).href,
+    ],
+  },
+  {
+    label: 'Falha de cobertura',
+    images: [new URL('../img/defeitos/falhaDeCobertura/IMG-20260720-WA0073.jpeg', import.meta.url).href],
+  },
+  {
+    label: 'Ferrugem',
+    images: [
+      new URL('../img/defeitos/ferrugem/IMG-20260611-WA0043.jpeg', import.meta.url).href,
+      new URL('../img/defeitos/ferrugem/IMG-20260613-WA0010.jpeg', import.meta.url).href,
+      new URL('../img/defeitos/ferrugem/IMG-20260615-WA0056.jpeg', import.meta.url).href,
+      new URL('../img/defeitos/ferrugem/IMG-20260617-WA0028.jpg', import.meta.url).href,
+      new URL('../img/defeitos/ferrugem/IMG-20260810-WA0050.jpeg', import.meta.url).href,
+    ],
+  },
+  {
+    label: 'Fervura',
+    images: [
+      new URL('../img/defeitos/fervura/IMG-20260711-WA0004.jpeg', import.meta.url).href,
+      new URL('../img/defeitos/fervura/IMG-20260721-WA0004(1).jpg', import.meta.url).href,
+      new URL('../img/defeitos/fervura/IMG-20260725-WA0037.jpg', import.meta.url).href,
+      new URL('../img/defeitos/fervura/IMG-20260730-WA0038.jpg', import.meta.url).href,
+      new URL('../img/defeitos/fervura/IMG-20260820-WA0001.jpg', import.meta.url).href,
+    ],
+  },
+  {
+    label: 'Sujeira',
+    images: [
+      new URL('../img/defeitos/sujeira/IMG-20260723-WA0002.jpg', import.meta.url).href,
+      new URL('../img/defeitos/sujeira/IMG-20260730-WA0030.jpg', import.meta.url).href,
+      new URL('../img/defeitos/sujeira/IMG-20260730-WA0031.jpg', import.meta.url).href,
+    ],
+  },
+];
+
 function Status({ value }) {
   const status = {
     '✓': { label: 'Pode liberar', Icon: Check },
@@ -82,6 +127,7 @@ function App() {
   const [selectedClass, setSelectedClass] = useState('1');
   const [selectedDefect, setSelectedDefect] = useState('Escorrido de tinta');
   const [showChecklist, setShowChecklist] = useState(false);
+  const [openGallery, setOpenGallery] = useState(null);
   const sections = useMemo(() => ['inicio', 'fluxo', 'condicoes', 'classes', 'matriz', 'atencao', 'exemplos'], []);
 
   const go = (index) => {
@@ -92,12 +138,16 @@ function App() {
   useEffect(() => {
     const onKey = (event) => {
       if (['INPUT', 'SELECT', 'TEXTAREA'].includes(event.target.tagName)) return;
+      if (openGallery) {
+        if (event.key === 'Escape') setOpenGallery(null);
+        return;
+      }
       if (event.key === 'ArrowRight' || event.key === 'ArrowDown') go(active + 1);
       if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') go(active - 1);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [active]);
+  }, [active, openGallery]);
 
   const row = defects.find(([name]) => name === selectedDefect);
   const outcome = row?.[1][Number(selectedClass) - 1] ?? '—';
@@ -202,11 +252,25 @@ function App() {
       </section>
 
       <section id="exemplos" className={`presentation-section examples-section ${active === 6 ? 'section-active' : ''}`}>
-        <SectionHeader eyebrow="03.2" title="Exemplos de não conformidades" text="Falha de pintura, ferrugem e contaminação: todos são casos de reprova." />
-        <div className="gallery"><figure><img src="/assets/paint-failure.jpeg" alt="Falha de pintura em peça metálica" /><figcaption><span><X size={14} /></span> FALHA DE PINTURA</figcaption></figure><figure><img src="/assets/rust.jpg" alt="Ferrugem em peça metálica pintada" /><figcaption><span><X size={14} /></span> FERRUGEM</figcaption></figure><figure><img src="/assets/contamination.jpg" alt="Contaminação visível em superfície" /><figcaption><span><X size={14} /></span> CONTAMINAÇÃO</figcaption></figure></div>
+        <SectionHeader eyebrow="03.2" title="Exemplos de não conformidades" text="Selecione um problema para abrir todas as fotos registradas." />
+        <div className="gallery defect-gallery">
+          {defectGalleries.map((gallery) => <button key={gallery.label} className="defect-gallery-card" onClick={() => setOpenGallery(gallery)}>
+            <img src={gallery.images[0]} alt={`Exemplo de ${gallery.label.toLowerCase()}`} />
+            <span className="defect-gallery-shade" />
+            <span className="defect-gallery-meta"><span><X size={14} /> REPROVAR</span><strong>{gallery.label}</strong><small>{gallery.images.length} {gallery.images.length === 1 ? 'foto' : 'fotos'} <ZoomIn size={14} /></small></span>
+          </button>)}
+        </div>
         <div className="final-call"><p>Na dúvida, não liberar automaticamente.</p><button className="primary-button" onClick={() => go(1)}>Revisar fluxo <ArrowUp size={18} /></button></div>
         <FooterRule />
       </section>
+
+      {openGallery && <div className="gallery-modal" role="dialog" aria-modal="true" aria-label={`Fotos de ${openGallery.label}`}>
+        <button className="gallery-modal-backdrop" onClick={() => setOpenGallery(null)} aria-label="Fechar galeria" />
+        <div className="gallery-modal-panel">
+          <header><div><span className="eyebrow">NÃO CONFORMIDADE</span><h2>{openGallery.label}</h2><p>{openGallery.images.length} {openGallery.images.length === 1 ? 'foto registrada' : 'fotos registradas'}</p></div><button className="gallery-modal-close" onClick={() => setOpenGallery(null)} aria-label="Fechar galeria"><X /></button></header>
+          <div className="gallery-modal-grid">{openGallery.images.map((image, index) => <figure key={image}><img src={image} alt={`${openGallery.label} — foto ${index + 1}`} /><figcaption>Foto {String(index + 1).padStart(2, '0')}</figcaption></figure>)}</div>
+        </div>
+      </div>}
 
       <div className="floating-controls" aria-label="Controles de slide"><button onClick={() => go(active - 1)} disabled={active === 0} aria-label="Seção anterior"><ChevronLeft /></button><button onClick={() => go(active + 1)} disabled={active === sections.length - 1} aria-label="Próxima seção"><ChevronRight /></button></div>
     </main>
