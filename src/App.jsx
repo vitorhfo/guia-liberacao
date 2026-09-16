@@ -72,28 +72,33 @@ const visibilityLevels = [
 const measurementScales = {
   dirt: {
     label: 'Tamanho da partícula',
-    bands: [{ group: 'A', max: 1 }, { group: 'B', max: 2 }, { group: 'C/D', max: 3 }, { group: 'E', max: 5 }, { group: 'F', max: 10 }],
+    bands: [{ group: 'A', max: 1 }, { group: 'B', max: 2 }, { group: 'C/D', max: 3 }, { group: 'E', max: 5 }, { group: 'F', max: 10 }], visibleEnd: 2,
   },
   scratch: {
     label: 'Comprimento do risco',
-    bands: [{ group: 'A', max: 0.5 }, { group: 'B', max: 1 }, { group: 'C/D', max: 2 }, { group: 'E', max: 10 }, { group: 'F', max: 20 }],
+    bands: [{ group: 'A', max: 0.5 }, { group: 'B', max: 1 }, { group: 'C/D', max: 2 }, { group: 'E', max: 10 }, { group: 'F', max: 20 }], visibleEnd: 2,
   },
   run: {
     label: 'Extensão do escorrido',
-    bands: [{ group: 'A', max: 0.3 }, { group: 'B', max: 1 }, { group: 'C', max: 5 }, { group: 'D', max: 10 }, { group: 'E', max: 20 }, { group: 'F', max: 30 }],
+    bands: [{ group: 'A', max: 0.3 }, { group: 'B', max: 1 }, { group: 'C', max: 5 }, { group: 'D', max: 10 }, { group: 'E', max: 20 }, { group: 'F', max: 30 }], visibleEnd: 3,
   },
 };
 
-function classifyMeasurement(value, scale) {
-  if (!Number.isFinite(value) || value < 0 || !scale) return null;
-  const bandIndex = scale.bands.findIndex((band) => value <= band.max);
-  if (bandIndex === -1) return { group: 'FORA DA ESCALA', visibility: 'Muito visível', limit: scale.bands.at(-1).max, outside: true };
-  const band = scale.bands[bandIndex];
+function likelyMeasurementRange(scale, visibility) {
+  if (!scale) return null;
+  const ranges = {
+    pouco: { start: 0, end: 1, label: 'A/B' },
+    visivel: { start: 2, end: scale.visibleEnd, label: 'C/D' },
+    muito: { start: scale.visibleEnd + 1, end: scale.bands.length - 1, label: 'E/F' },
+  };
+  const range = ranges[visibility];
+  const first = scale.bands[range.start];
+  const last = scale.bands[range.end];
   return {
-    group: band.group,
-    visibility: bandIndex <= 1 ? 'Pouco visível' : bandIndex <= 3 ? 'Visível' : 'Muito visível',
-    limit: band.max,
-    outside: false,
+    group: range.label,
+    text: range.start === 0 ? `até ${last.max} mm` : `acima de ${scale.bands[range.start - 1].max} até ${last.max} mm`,
+    first,
+    last,
   };
 }
 
@@ -197,7 +202,6 @@ function App() {
   const classHoverTimer = useRef(null);
   const [selectedDefect, setSelectedDefect] = useState('Escorrido de tinta');
   const [selectedVisibility, setSelectedVisibility] = useState('pouco');
-  const [measurement, setMeasurement] = useState('');
   const [showChecklist, setShowChecklist] = useState(false);
   const [openGallery, setOpenGallery] = useState(null);
   const sections = useMemo(() => ['inicio', 'fluxo', 'condicoes', 'classes', 'matriz', 'atencao', 'exemplos'], []);
@@ -239,20 +243,12 @@ function App() {
   const defectCriterion = defectCriteria[selectedDefect] ?? defectCriteria['Falha de pintura'];
   const visibility = visibilityLevels.find((item) => item.id === selectedVisibility) ?? visibilityLevels[0];
   const measurementScale = measurementScales[defectCriterion.measurement];
-  const measurementValue = measurement.trim() === '' ? Number.NaN : Number(measurement.replace(',', '.'));
-  const measurementResult = classifyMeasurement(measurementValue, measurementScale);
-  const calculatedVisibility = measurementResult?.visibility;
-  const canRelease = measurementScale
-    ? Boolean(measurementResult && !measurementResult.outside && matrixOutcome === '✓')
-    : matrixOutcome === '✓' && selectedVisibility !== 'muito';
+  const likelyRange = likelyMeasurementRange(measurementScale, selectedVisibility);
+  const canRelease = matrixOutcome === '✓' && selectedVisibility !== 'muito';
   const outcome = canRelease ? '✓' : '✕';
   const outcomeText = canRelease ? 'Pode liberar' : 'Não pode liberar';
   const outcomeDetail = measurementScale
-    ? !measurementResult
-      ? `Informe ${measurementScale.label.toLowerCase()} em mm para receber a decisão.`
-      : measurementResult.outside
-        ? `${measurement} mm excede o máximo da escala F (${measurementResult.limit} mm). Não pode liberar.`
-        : `${measurement} mm · grupo ${measurementResult.group} · ${measurementResult.visibility}. ${canRelease ? 'Pode liberar pela regra direta.' : 'Não libera para esta classe pela matriz.'}`
+    ? `${visibility.label}: provavelmente se enquadra no grupo ${likelyRange.group}, ${likelyRange.text}. ${canRelease ? 'Pode liberar pela regra direta.' : 'Não libera pela regra direta.'}`
     : `${visibility.code} — ${visibility.standard}. ${canRelease ? 'Pode liberar pela regra direta.' : 'Não libera pela regra direta.'} ${defectCriterion.detail}`;
   const displayClass = classes.find((item) => item.id === selectedClass) ?? classes[0];
   const previewClass = classes.find((item) => item.id === hoveredClass);
@@ -338,15 +334,15 @@ function App() {
         <div className="matrix-wrap"><table><thead><tr><th>DEFEITO</th>{classes.map((item) => <th key={item.id}>CLASSE {item.id}</th>)}</tr></thead><tbody>{defects.map(([name, results]) => <tr key={name} className={selectedDefect === name ? 'chosen' : ''} onClick={() => setSelectedDefect(name)}>{<th>{name}</th>}{results.map((result, index) => <td key={`${name}-${index}`}><Status value={result} /></td>)}</tr>)}</tbody></table></div>
         <div className="legend"><span><Status value="✓" /> PODE LIBERAR</span><span><Status value="!" /> AVALIAR</span><span><Status value="✕" /> REPROVAR</span><span><Status value="—" /> CONSULTAR NORMA</span></div>
         <div className="decision-tool">
-          <div className="decision-intro"><span className="eyebrow">DECISÃO DIRETA</span><h3>Pode liberar ou não?</h3><p>Informe a medida quando aplicável. Para defeitos visuais, selecione o nível observado.</p></div>
-          <label>Defeito<select value={selectedDefect} onChange={(event) => { setSelectedDefect(event.target.value); setMeasurement(''); }}>{defects.map(([name]) => <option key={name}>{name}</option>)}</select></label>
+          <div className="decision-intro"><span className="eyebrow">DECISÃO DIRETA</span><h3>Pode liberar ou não?</h3><p>Informe como o defeito aparece. A consulta mostra a faixa provável em milímetros quando houver escala Volvo.</p></div>
+          <label>Defeito<select value={selectedDefect} onChange={(event) => setSelectedDefect(event.target.value)}>{defects.map(([name]) => <option key={name}>{name}</option>)}</select></label>
           <label>Classe<select value={selectedClass} onChange={(event) => setSelectedClass(event.target.value)}>{classes.map((item) => <option key={item.id} value={item.id}>{item.id} — {item.label}</option>)}</select></label>
-          {measurementScale ? <label>{measurementScale.label} (mm)<input type="number" min="0" step="0.1" inputMode="decimal" value={measurement} onChange={(event) => setMeasurement(event.target.value)} placeholder="Ex.: 1,0" /></label> : <label>Visibilidade<select value={selectedVisibility} onChange={(event) => setSelectedVisibility(event.target.value)}>{visibilityLevels.map((item) => <option key={item.id} value={item.id}>{item.label} · {item.code}</option>)}</select></label>}
+          <label>Visibilidade<select value={selectedVisibility} onChange={(event) => setSelectedVisibility(event.target.value)}>{visibilityLevels.map((item) => <option key={item.id} value={item.id}>{item.label} · {item.code}</option>)}</select></label>
           <div className={`outcome outcome-${outcome}`}><Status value={outcome} /><strong>{outcomeText}</strong><span>{selectedDefect} · Classe {selectedClass}</span></div>
-          <div className={`criterion-note criterion-${defectCriterion.type.toLowerCase()}`}><span>{measurementResult ? `${measurementResult.group} · ${calculatedVisibility.toUpperCase()}` : defectCriterion.type === 'Visual' ? `ESCALA ${visibility.code}` : defectCriterion.type.toUpperCase()}</span><strong>{defectCriterion.reference}</strong><p>{outcomeDetail}</p></div>
+          <div className={`criterion-note criterion-${defectCriterion.type.toLowerCase()}`}><span>{likelyRange ? `${likelyRange.group} · FAIXA PROVÁVEL` : defectCriterion.type === 'Visual' ? `ESCALA ${visibility.code}` : defectCriterion.type.toUpperCase()}</span><strong>{defectCriterion.reference}</strong><p>{outcomeDetail}</p></div>
         </div>
         <div className="visibility-guide" aria-label="Critérios de visibilidade Volvo">{visibilityLevels.map((item) => <div key={item.id} className={selectedVisibility === item.id ? 'selected' : ''}><b>{item.code}</b><span><strong>{item.label}</strong><small>{item.standard} · {item.detail}</small></span></div>)}</div>
-        <p className="fine-print">Padrão direto do guia: grupos A/B são pouco visíveis; C/D são visíveis; E/F são muito visíveis. Em defeitos mensuráveis, a medida em mm determina o grupo. A liberação só ocorre quando a medida está dentro da escala e a célula da matriz está marcada como “Pode liberar”. Defeitos muito visíveis não liberam pela regra direta.</p>
+        <p className="fine-print">Padrão direto do guia: grupos A/B representam pouco visível; C/D representam visível; E/F representam muito visível. Para defeitos mensuráveis, a consulta apresenta uma faixa provável da tabela Volvo; a medição real em mm deve confirmar o enquadramento. A liberação depende da célula “Pode liberar” na matriz e defeitos muito visíveis não liberam pela regra direta.</p>
         <FooterRule />
       </section>
 
