@@ -24,10 +24,10 @@ import {
 } from 'lucide-react';
 
 const classes = [
-  { id: '1', label: 'Muito alta', detail: 'Visível no campo imediato de visão do observador.', example: 'Frente, painéis principais, regiões externas críticas' },
-  { id: '2', label: 'Média', detail: 'Visível, porém afastada do campo imediato de visão.', example: 'Áreas visíveis secundárias ou de observação eventual' },
-  { id: '3', label: 'Baixa', detail: 'Não imediatamente visível.', example: 'Regiões internas, inferiores ou pouco aparentes' },
-  { id: '4', label: 'Oculta', detail: 'Permanentemente oculta após montagem.', example: 'Áreas internas cobertas ou escondidas' },
+  { id: '1', label: 'Muito alta', detail: 'Visível no campo imediato de visão do observador.', example: 'Frente, painéis principais, regiões externas críticas', image: new URL('../img/classes/classe 1/classs1.png', import.meta.url).href, imageAlt: 'Área externa visível da máquina indicada em vermelho' },
+  { id: '2', label: 'Média', detail: 'Visível, porém afastada do campo imediato de visão.', example: 'Áreas visíveis secundárias ou de observação eventual', image: new URL('../img/classes/classe2/class2.png', import.meta.url).href, imageAlt: 'Área lateral da máquina indicada em vermelho' },
+  { id: '3', label: 'Baixa', detail: 'Não imediatamente visível.', example: 'Regiões internas, inferiores ou pouco aparentes', image: new URL('../img/classes/classe3/class3.png', import.meta.url).href, imageAlt: 'Área interna da máquina indicada em vermelho' },
+  { id: '4', label: 'Oculta', detail: 'Permanentemente oculta após montagem.', example: 'Áreas internas cobertas ou escondidas', image: null, imageAlt: null },
 ];
 
 const defects = [
@@ -125,6 +125,7 @@ function FooterRule() {
 function App() {
   const [active, setActive] = useState(0);
   const [selectedClass, setSelectedClass] = useState('1');
+  const [hoveredClass, setHoveredClass] = useState(null);
   const [selectedDefect, setSelectedDefect] = useState('Escorrido de tinta');
   const [showChecklist, setShowChecklist] = useState(false);
   const [openGallery, setOpenGallery] = useState(null);
@@ -152,6 +153,7 @@ function App() {
   const row = defects.find(([name]) => name === selectedDefect);
   const outcome = row?.[1][Number(selectedClass) - 1] ?? '—';
   const outcomeText = { '✓': 'Pode liberar', '!': 'Avaliar', '✕': 'Reprovar', '—': 'Consultar a norma' }[outcome];
+  const displayClass = classes.find((item) => item.id === (hoveredClass ?? selectedClass)) ?? classes[0];
 
   return (
     <main>
@@ -213,12 +215,12 @@ function App() {
       </section>
 
       <section id="classes" className={`presentation-section classes-section ${active === 3 ? 'section-active' : ''}`}>
-        <SectionHeader eyebrow="02" title="Classificação das superfícies" text="Aplicável às duas normas." />
+        <SectionHeader eyebrow="02" title="Classificação das superfícies" text="Passe o mouse sobre uma classe para ver onde a peça fica na máquina." />
         <div className="class-scale" aria-label="Escala de exigência estética">
-          {classes.map((item, index) => <button key={item.id} className={`class-item class-${item.id} ${selectedClass === item.id ? 'selected' : ''}`} onClick={() => setSelectedClass(item.id)}><span className="class-number">{item.id}</span><span className="class-label">{item.label}</span><small>{index === 0 ? 'MAIOR EXIGÊNCIA ESTÉTICA' : index === 3 ? 'MENOR EXIGÊNCIA ESTÉTICA' : ''}</small></button>)}
+          {classes.map((item, index) => <button key={item.id} className={`class-item class-${item.id} ${selectedClass === item.id ? 'selected' : ''}`} onClick={() => setSelectedClass(item.id)} onMouseEnter={() => setHoveredClass(item.id)} onMouseLeave={() => setHoveredClass(null)} onFocus={() => setHoveredClass(item.id)} onBlur={() => setHoveredClass(null)}><span className="class-number">{item.id}</span><span className="class-label">{item.label}</span><small>{index === 0 ? 'MAIOR EXIGÊNCIA ESTÉTICA' : index === 3 ? 'MENOR EXIGÊNCIA ESTÉTICA' : ''}</small></button>)}
         </div>
         <div className="class-details">
-          {classes.map((item) => <article className={selectedClass === item.id ? 'visible' : ''} key={item.id}><span>CLASSE {item.id}</span><h3>{item.label}</h3><p>{item.detail}</p><p className="example"><b>Exemplo de aplicação</b>{item.example}</p></article>)}
+          <article className={`visible class-detail-${displayClass.id}`} style={{ '--class-color': `var(--class-${displayClass.id})` }}><span>CLASSE {displayClass.id}</span><h3>{displayClass.label}</h3><p>{displayClass.detail}</p><p className="example"><b>Exemplo de aplicação</b>{displayClass.example}</p><figure className="class-photo">{displayClass.image ? <img src={displayClass.image} alt={displayClass.imageAlt} /> : <div><Eye size={28} /><span>Oculta após montagem</span></div>}<figcaption>{displayClass.image ? 'Local de aplicação na máquina' : 'Sem avaliação estética após a montagem'}</figcaption></figure></article>
         </div>
         <FooterRule />
       </section>
