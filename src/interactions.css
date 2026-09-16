@@ -1,4 +1,10 @@
-html { scroll-snap-type: y proximity; scroll-padding-top: 72px; }
+html, body, #root, main { width: 100%; height: 100%; overflow: hidden; }
+html { scroll-snap-type: none; scroll-padding-top: 0; }
+body { overscroll-behavior: none; }
+
+.topbar { position: fixed; top: 0; right: 0; left: 0; }
+.presentation-section { position: absolute; inset: 0; width: 100%; height: 100vh; min-height: 0; overflow: hidden; opacity: 0; visibility: hidden; pointer-events: none; transform: translateX(4%); transition: opacity .34s ease, transform .5s cubic-bezier(.2,.8,.2,1), visibility 0s linear .5s; }
+.presentation-section.section-active { opacity: 1; visibility: visible; pointer-events: auto; transform: translateX(0); transition-delay: 0s; }
 
 .brand { display: flex; align-items: center; }
 .brand span { display: inline-grid; place-items: center; font-family: inherit; }
@@ -19,7 +25,6 @@ html { scroll-snap-type: y proximity; scroll-padding-top: 72px; }
 .slide-rail button.active i { height: 3px; background: var(--yellow); }
 .slide-rail button.active svg { opacity: 1; transform: translateX(0); color: var(--yellow); }
 
-.presentation-section { scroll-snap-align: start; scroll-snap-stop: always; }
 .section-active .section-header { animation: reveal-up .55s both; }
 .section-active .flow-layout, .section-active .conditions-layout, .section-active .class-scale, .section-active .matrix-wrap, .section-active .attention-grid, .section-active .gallery { animation: reveal-up .68s .08s both; }
 .section-active .warning-band, .section-active .attention-message, .section-active .decision-tool, .section-active .final-call { animation: reveal-up .55s .18s both; }
@@ -53,9 +58,19 @@ html { scroll-snap-type: y proximity; scroll-padding-top: 72px; }
 }
 
 @media (max-width: 600px) {
-  html { scroll-padding-top: 60px; }
   .presentation-section { padding-right: 48px; }
   .slide-rail { top: auto; right: 14px; bottom: 64px; gap: 0; padding: 5px; transform: none; background: rgba(17,20,22,.86); box-shadow: 0 8px 24px rgba(0,0,0,.18); }
   .slide-rail button { grid-template-columns: 15px 16px; min-height: 23px; }
   .slide-rail button svg { display: none; }
+}
+
+@media (max-height: 820px) and (min-width: 601px) {
+  .presentation-section { padding-top: 88px; padding-bottom: 24px; }
+  .section-header { margin-bottom: 24px; }
+  .footer-rule { margin-top: 20px; }
+  .matrix-wrap th, .matrix-wrap td { padding-top: 7px; padding-bottom: 7px; }
+  .legend { margin-top: 12px; margin-bottom: 18px; }
+  .decision-tool { padding: 18px 22px; }
+  .attention-card { min-height: 220px; }
+  .gallery figure { min-height: 280px; }
 }

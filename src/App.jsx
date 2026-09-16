@@ -87,33 +87,17 @@ function App() {
   const go = (index) => {
     const next = Math.max(0, Math.min(sections.length - 1, index));
     setActive(next);
-    document.getElementById(sections[next])?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   useEffect(() => {
     const onKey = (event) => {
+      if (['INPUT', 'SELECT', 'TEXTAREA'].includes(event.target.tagName)) return;
       if (event.key === 'ArrowRight' || event.key === 'ArrowDown') go(active + 1);
       if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') go(active - 1);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [active]);
-
-  useEffect(() => {
-    const syncActiveSection = () => {
-      const referenceLine = window.innerHeight * 0.38;
-      const sectionAtReference = sections.findIndex((id) => {
-        const element = document.getElementById(id);
-        if (!element) return false;
-        const bounds = element.getBoundingClientRect();
-        return bounds.top <= referenceLine && bounds.bottom > referenceLine;
-      });
-      if (sectionAtReference >= 0) setActive(sectionAtReference);
-    };
-    syncActiveSection();
-    window.addEventListener('scroll', syncActiveSection, { passive: true });
-    return () => window.removeEventListener('scroll', syncActiveSection);
-  }, [sections]);
 
   const row = defects.find(([name]) => name === selectedDefect);
   const outcome = row?.[1][Number(selectedClass) - 1] ?? '—';
