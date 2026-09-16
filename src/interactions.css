@@ -104,6 +104,13 @@ body { overscroll-behavior: none; }
   .decision-tool p { font-size: 10px; }
   .decision-tool select { margin-top: 4px; padding: 7px 8px; }
   .outcome { min-height: 44px; }
+  .criterion-note { gap: 5px 9px; padding-top: 6px; }
+  .criterion-note p { font-size: 9px; }
+  .visibility-guide { margin-top: 6px; }
+  .visibility-guide > div { min-height: 42px; padding: 5px 10px; }
+  .visibility-guide b { width: 22px; height: 22px; font-size: 16px; }
+  .visibility-guide strong { font-size: 9px; }
+  .visibility-guide small { font-size: 8px; line-height: 1.15; }
   .matrix-section .fine-print { margin-top: 4px; font-size: 9px; line-height: 1.2; }
   .matrix-section .footer-rule { margin-top: 3px; font-size: 8px; }
   .attention-card { min-height: 210px; padding: 18px; }
@@ -121,6 +128,12 @@ body { overscroll-behavior: none; }
   .footer-rule { flex:0 0 auto; }
   .floating-controls { display:none; }
   .slide-rail { bottom:14px; }
+  .decision-tool { grid-template-columns:1fr; align-items:stretch; }
+  .decision-tool > div:first-child, .criterion-note { grid-column:auto; }
+  .criterion-note { grid-template-columns:auto 1fr; align-items:start; }
+  .criterion-note p { grid-column:1/-1; }
+  .visibility-guide { grid-template-columns:1fr; }
+  .visibility-guide > div { min-height:0; }
   .attention-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
   .attention-card { min-height:210px; padding:16px; }
   .defect-gallery { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }

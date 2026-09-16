@@ -45,6 +45,45 @@ const defects = [
   ['Mapeamento da chapa', ['✕', '!', '✓', '✓']],
 ];
 
+const visibilityLevels = [
+  {
+    id: 'pouco',
+    label: 'Pouco visível',
+    code: 'I',
+    standard: 'Praticamente invisível',
+    detail: 'Só é percebido durante a inspeção visual controlada.',
+  },
+  {
+    id: 'visivel',
+    label: 'Visível',
+    code: 'II',
+    standard: 'Muito pouco visível',
+    detail: 'É percebido de forma leve nas condições de inspeção.',
+  },
+  {
+    id: 'muito',
+    label: 'Muito visível',
+    code: 'III',
+    standard: 'Claramente visível',
+    detail: 'É evidente para o inspetor nas condições de inspeção.',
+  },
+];
+
+const defectCriteria = {
+  'Escorrido de tinta': { type: 'Mensurável', reference: 'Escorridos e gotas', detail: 'Meça a dimensão em mm conforme a tabela de defeitos mensuráveis.' },
+  Sujeira: { type: 'Mensurável', reference: 'Sujeira e fibras', detail: 'Meça o tamanho da partícula em mm conforme a tabela de defeitos mensuráveis.' },
+  'Casca de laranja': { type: 'Visual', reference: 'Acabamento textural', detail: 'Não aparece nominalmente na tabela; compare com o padrão aprovado e a especificação aplicável.' },
+  Contaminação: { type: 'Mensurável', reference: 'Sujeira e fibras', detail: 'Quando houver partícula no filme, meça o tamanho em mm; para outra contaminação, consulte a especificação.' },
+  Ferrugem: { type: 'Específico', reference: 'Especificação aplicável', detail: 'A aceitação de corrosão deve seguir os documentos técnicos e normas específicas do produto.' },
+  Risco: { type: 'Mensurável', reference: 'Risco superficial', detail: 'Meça o comprimento do risco em mm conforme a tabela de defeitos mensuráveis.' },
+  'Marca de lixamento': { type: 'Visual', reference: 'Marca de lixamento isolada', detail: 'Avalie pela escala visual I, II ou III da tabela de defeitos não mensuráveis.' },
+  Poros: { type: 'Visual', reference: 'Poros e pinholes', detail: 'Avalie pela escala visual I, II ou III da tabela de defeitos não mensuráveis.' },
+  Bolhas: { type: 'Visual', reference: 'Bolhas', detail: 'Avalie pela escala visual I, II ou III da tabela de defeitos não mensuráveis.' },
+  'Falha de pintura': { type: 'Específico', reference: 'Cobertura e proteção', detail: 'Compare com a especificação da peça, pois a falha pode comprometer a proteção do substrato.' },
+  'Diferença da coloração': { type: 'Visual', reference: 'Desvio de cor', detail: 'Avalie pela escala visual I, II ou III da tabela de defeitos não mensuráveis.' },
+  'Mapeamento da chapa': { type: 'Visual', reference: 'Flamagem / aparência não uniforme', detail: 'Avalie pela escala visual I, II ou III da tabela de defeitos não mensuráveis.' },
+};
+
 const nav = [
   { label: 'Início', Icon: ShieldCheck },
   { label: 'Fluxo', Icon: GitBranch },
@@ -129,6 +168,7 @@ function App() {
   const [classPreviewPosition, setClassPreviewPosition] = useState({ x: 0, y: 0 });
   const classHoverTimer = useRef(null);
   const [selectedDefect, setSelectedDefect] = useState('Escorrido de tinta');
+  const [selectedVisibility, setSelectedVisibility] = useState('pouco');
   const [showChecklist, setShowChecklist] = useState(false);
   const [openGallery, setOpenGallery] = useState(null);
   const sections = useMemo(() => ['inicio', 'fluxo', 'condicoes', 'classes', 'matriz', 'atencao', 'exemplos'], []);
@@ -166,8 +206,15 @@ function App() {
   useEffect(() => () => window.clearTimeout(classHoverTimer.current), []);
 
   const row = defects.find(([name]) => name === selectedDefect);
-  const outcome = row?.[1][Number(selectedClass) - 1] ?? '—';
+  const matrixOutcome = row?.[1][Number(selectedClass) - 1] ?? '—';
+  const defectCriterion = defectCriteria[selectedDefect] ?? defectCriteria['Falha de pintura'];
+  const visibility = visibilityLevels.find((item) => item.id === selectedVisibility) ?? visibilityLevels[0];
+  const requiresVisualAssessment = defectCriterion.type === 'Visual';
+  const outcome = requiresVisualAssessment && selectedVisibility === 'muito' && matrixOutcome === '✓' ? '!' : matrixOutcome;
   const outcomeText = { '✓': 'Pode liberar', '!': 'Avaliar', '✕': 'Reprovar', '—': 'Consultar a norma' }[outcome];
+  const outcomeDetail = requiresVisualAssessment
+    ? `${visibility.code} — ${visibility.standard}. ${selectedVisibility === 'muito' && matrixOutcome === '✓' ? 'Confirme o limite da classe antes de liberar.' : defectCriterion.detail}`
+    : `${defectCriterion.type}: ${defectCriterion.detail}`;
   const displayClass = classes.find((item) => item.id === selectedClass) ?? classes[0];
   const previewClass = classes.find((item) => item.id === hoveredClass);
   const previewStyle = previewClass ? {
@@ -248,16 +295,19 @@ function App() {
       </section>
 
       <section id="matriz" className={`presentation-section matrix-section ${active === 4 ? 'section-active' : ''}`}>
-        <SectionHeader eyebrow="02.2" title="Defeitos e classes" text="Clique numa linha da matriz para consultar o resultado." />
+        <SectionHeader eyebrow="02.2" title="Defeitos e classes" text="Clique numa linha da matriz e registre a visibilidade observada para consultar o resultado." />
         <div className="matrix-wrap"><table><thead><tr><th>DEFEITO</th>{classes.map((item) => <th key={item.id}>CLASSE {item.id}</th>)}</tr></thead><tbody>{defects.map(([name, results]) => <tr key={name} className={selectedDefect === name ? 'chosen' : ''} onClick={() => setSelectedDefect(name)}>{<th>{name}</th>}{results.map((result, index) => <td key={`${name}-${index}`}><Status value={result} /></td>)}</tr>)}</tbody></table></div>
         <div className="legend"><span><Status value="✓" /> PODE LIBERAR</span><span><Status value="!" /> AVALIAR</span><span><Status value="✕" /> REPROVAR</span><span><Status value="—" /> CONSULTAR NORMA</span></div>
         <div className="decision-tool">
-          <div><span className="eyebrow">CONSULTA RÁPIDA</span><h3>Decisão por classe e defeito</h3><p>Confira a indicação da matriz antes de liberar a peça.</p></div>
+          <div><span className="eyebrow">CONSULTA RÁPIDA</span><h3>Classe, defeito e visibilidade</h3><p>A matriz permanece como referência; a escala Volvo define a evidência visual do defeito.</p></div>
           <label>Defeito<select value={selectedDefect} onChange={(event) => setSelectedDefect(event.target.value)}>{defects.map(([name]) => <option key={name}>{name}</option>)}</select></label>
           <label>Classe<select value={selectedClass} onChange={(event) => setSelectedClass(event.target.value)}>{classes.map((item) => <option key={item.id} value={item.id}>{item.id} — {item.label}</option>)}</select></label>
+          <label>Visibilidade<select value={selectedVisibility} onChange={(event) => setSelectedVisibility(event.target.value)}>{visibilityLevels.map((item) => <option key={item.id} value={item.id}>{item.label} · {item.code}</option>)}</select></label>
           <div className={`outcome outcome-${outcome}`}><Status value={outcome} /><strong>{outcomeText}</strong><span>{selectedDefect} · Classe {selectedClass}</span></div>
+          <div className={`criterion-note criterion-${defectCriterion.type.toLowerCase()}`}><span>{defectCriterion.type === 'Visual' ? `ESCALA ${visibility.code}` : defectCriterion.type.toUpperCase()}</span><strong>{defectCriterion.reference}</strong><p>{outcomeDetail}</p></div>
         </div>
-        <p className="fine-print">Em “Avaliar”, verifique se a não conformidade está muito visível conforme os limites das ITS 176 e ITS 177 ou STD120-0014 e STD120-0015, e se não compromete a função ou a proteção da peça.</p>
+        <div className="visibility-guide" aria-label="Critérios de visibilidade Volvo">{visibilityLevels.map((item) => <div key={item.id} className={selectedVisibility === item.id ? 'selected' : ''}><b>{item.code}</b><span><strong>{item.label}</strong><small>{item.standard} · {item.detail}</small></span></div>)}</div>
+        <p className="fine-print">Critério visual baseado na STD 120-0014: avalie superfície limpa ou recém-pintada, com luz difusa uniforme de 1.500–2.000 lux e 4.000 K. A classificação I, II ou III é julgada por inspetor experiente. Defeitos mensuráveis exigem também a medida em mm da tabela aplicável.</p>
         <FooterRule />
       </section>
 
