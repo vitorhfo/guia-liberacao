@@ -80,6 +80,12 @@ const visibilityLevels = [
   },
 ];
 
+const quantityLevels = [
+  { id: 'quase-nada', label: 'Quase nada', count: 1, detail: '1 defeito' },
+  { id: 'pouco', label: 'Pouco', count: 3, detail: '2 a 3 defeitos' },
+  { id: 'bastante', label: 'Bastante', count: 4, detail: '4 ou mais defeitos' },
+];
+
 const measurementScales = {
   dirt: {
     label: 'Tamanho da partícula',
@@ -212,7 +218,7 @@ function App() {
   const [selectedSurfaceClass, setSelectedSurfaceClass] = useState('1A');
   const [selectedVisibility, setSelectedVisibility] = useState('pouco');
   const [measurementValue, setMeasurementValue] = useState('');
-  const [defectCount, setDefectCount] = useState(1);
+  const [selectedQuantity, setSelectedQuantity] = useState('quase-nada');
   const [noHigherDefects, setNoHigherDefects] = useState(false);
   const [showChecklist, setShowChecklist] = useState(false);
   const [openGallery, setOpenGallery] = useState(null);
@@ -271,7 +277,8 @@ function App() {
   const visibility = visibilityLevels.find((item) => item.id === selectedVisibility) ?? visibilityLevels[0];
   const measurementScale = measurementScales[defectCriterion.measurement];
   const selectedStandardClass = surfaceClasses.find((item) => item.id === selectedSurfaceClass) ?? surfaceClasses[0];
-  const count = Math.max(1, Number(defectCount) || 1);
+  const quantity = quantityLevels.find((item) => item.id === selectedQuantity) ?? quantityLevels[0];
+  const count = quantity.count;
   const matchingGroups = defectCriterion.type === 'Mensurável'
     ? groupsForMeasurement(measurementScale, measurementValue)
     : defectCriterion.visual?.[selectedVisibility] ?? null;
@@ -403,12 +410,12 @@ function App() {
           <label>Defeito<select value={selectedDefect} onChange={(event) => { setSelectedDefect(event.target.value); setMeasurementValue(''); }}>{defects.map((item) => <option key={item.name}>{item.name}</option>)}</select></label>
           <label>Classe da superfície<select value={selectedSurfaceClass} onChange={(event) => setSelectedSurfaceClass(event.target.value)}>{surfaceClasses.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select></label>
           {defectCriterion.type === 'Mensurável' ? <label>{measurementScale.label} (mm)<input type="number" min="0" step="0.1" value={measurementValue} onChange={(event) => setMeasurementValue(event.target.value)} placeholder="Informe a medida" /></label> : <label>Visibilidade<select value={selectedVisibility} onChange={(event) => setSelectedVisibility(event.target.value)}>{visibilityLevels.map((item) => <option key={item.id} value={item.id}>{item.code} · {item.label}</option>)}</select></label>}
-          <label>Quantidade na área inspecionada<input type="number" min="1" step="1" value={defectCount} onChange={(event) => setDefectCount(event.target.value)} /></label>
+          <label>Quantidade de defeitos<select value={selectedQuantity} onChange={(event) => setSelectedQuantity(event.target.value)}>{quantityLevels.map((item) => <option key={item.id} value={item.id}>{item.label} · {item.detail}</option>)}</select></label>
           {defectCriterion.type === 'Visual' || defectCriterion.type === 'Mensurável' ? <label className="transfer-choice"><input type="checkbox" checked={noHigherDefects} onChange={(event) => setNoHigherDefects(event.target.checked)} /> Não há defeitos em grupos mais altos na área</label> : null}
           <div className={`outcome outcome-${outcome}`}><Status value={outcome} /><strong>{outcomeText}</strong><span>{selectedDefect} · Classe {selectedSurfaceClass}</span></div>
           <div className={`criterion-note criterion-${defectCriterion.type.toLowerCase()}`}><span>{matchingGroups?.length ? `GRUPO ${matchingGroups.join('/')}` : defectCriterion.type}</span><strong>{defectCriterion.reference}</strong><p>{outcomeDetail}{transferDetail}</p></div>
         </div>
-        <p className="fine-print">Baseado na STD 120-0014: a classe 1 e a classe 2 possuem níveis A e B. Os limites de quantidade valem para a área avaliada de 0,5–1 m². Em áreas menores, também se aplicam os limites de no máximo dois defeitos em 300 mm para 1A/1B e três para 2A/2B. A transferência de quantidade só vale quando não existem defeitos em grupos mais altos na mesma área.</p>
+        <p className="fine-print">Quantidade simplificada: quase nada = 1 defeito; pouco = 2 a 3 defeitos e o cálculo usa 3; bastante = 4 ou mais e o cálculo usa 4. Baseado na STD 120-0014: a classe 1 e a classe 2 possuem níveis A e B. Os limites valem para a área avaliada de 0,5–1 m². Em áreas menores, também se aplicam os limites de no máximo dois defeitos em 300 mm para 1A/1B e três para 2A/2B. A transferência de quantidade só vale quando não existem defeitos em grupos mais altos na mesma área.</p>
         <FooterRule />
       </section>
 
