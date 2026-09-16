@@ -69,6 +69,12 @@ const visibilityLevels = [
   },
 ];
 
+const visualDecisionRows = [
+  { id: 'pouco', group: 'A / B', range: 'Faixa inicial da escala', decision: 'Libera se a célula for ✓' },
+  { id: 'visivel', group: 'C / D', range: 'Faixa intermediária', decision: 'Libera se a célula for ✓' },
+  { id: 'muito', group: 'E / F', range: 'Faixa final da escala', decision: 'Não liberar' },
+];
+
 const measurementScales = {
   dirt: {
     label: 'Tamanho da partícula',
@@ -341,7 +347,13 @@ function App() {
           <div className={`outcome outcome-${outcome}`}><Status value={outcome} /><strong>{outcomeText}</strong><span>{selectedDefect} · Classe {selectedClass}</span></div>
           <div className={`criterion-note criterion-${defectCriterion.type.toLowerCase()}`}><span>{likelyRange ? `${likelyRange.group} · FAIXA PROVÁVEL` : defectCriterion.type === 'Visual' ? `ESCALA ${visibility.code}` : defectCriterion.type.toUpperCase()}</span><strong>{defectCriterion.reference}</strong><p>{outcomeDetail}</p></div>
         </div>
-        <div className="visibility-guide" aria-label="Critérios de visibilidade Volvo">{visibilityLevels.map((item) => <div key={item.id} className={selectedVisibility === item.id ? 'selected' : ''}><b>{item.code}</b><span><strong>{item.label}</strong><small>{item.standard} · {item.detail}</small></span></div>)}</div>
+        <div className="visual-table" role="table" aria-label="Tabela visual de decisão Volvo">
+          <div className="visual-table-head" role="row"><span>APARÊNCIA</span><span>GRUPO VOLVO</span><span>MEDIDA PROVÁVEL</span><span>DECISÃO DIRETA</span></div>
+          {visualDecisionRows.map((row) => {
+            const item = visibilityLevels.find((level) => level.id === row.id);
+            return <button key={row.id} type="button" role="row" className={`visual-table-row ${selectedVisibility === row.id ? 'selected' : ''} ${row.id}`} onClick={() => setSelectedVisibility(row.id)} aria-pressed={selectedVisibility === row.id}><span><b>{item.code}</b><strong>{item.label}</strong></span><span>{row.group}</span><span>{row.range}</span><strong>{row.decision}</strong></button>;
+          })}
+        </div>
         <p className="fine-print">Padrão direto do guia: grupos A/B representam pouco visível; C/D representam visível; E/F representam muito visível. Para defeitos mensuráveis, a consulta apresenta uma faixa provável da tabela Volvo; a medição real em mm deve confirmar o enquadramento. A liberação depende da célula “Pode liberar” na matriz e defeitos muito visíveis não liberam pela regra direta.</p>
         <FooterRule />
       </section>
