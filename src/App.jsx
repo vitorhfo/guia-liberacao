@@ -154,8 +154,8 @@ const defectGalleries = [
   {
     label: 'Desplacamento',
     images: [
-      new URL('../img/defeitos/desplacamento/Imagem4-tratada.jpg', import.meta.url).href,
-      new URL('../img/defeitos/desplacamento/Imagem5-tratada.jpg', import.meta.url).href,
+      new URL('../img/defeitos/desplacamento/Imagem4-tratada.png', import.meta.url).href,
+      new URL('../img/defeitos/desplacamento/Imagem5-tratada.png', import.meta.url).href,
       new URL('../img/defeitos/desplacamento/Imagem6-tratada.jpg', import.meta.url).href,
       new URL('../img/defeitos/desplacamento/Imagem7-tratada.png', import.meta.url).href,
     ],
