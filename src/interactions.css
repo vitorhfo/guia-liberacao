@@ -139,6 +139,14 @@ body { overscroll-behavior: none; }
 .visual-table-row b { display: grid; width: 21px; height: 21px; place-items: center; border: 1px solid rgba(17,20,22,.55); font-family: 'Barlow Condensed', sans-serif; font-size: 16px; }
 .visual-table-row strong { font-size: 10px; text-transform: uppercase; }
 .visual-table-row.muito > strong { color: var(--red); }
+.matrix-wrap .matrix-visual-heading { cursor: default; }
+.matrix-wrap .matrix-visual-heading th { padding: 7px 16px; color: #fff; background: #5e5121; font-size: 9px; letter-spacing: .08em; text-align: left; }
+.matrix-wrap .matrix-visual-row { color: #111416; background: #f8d35a; font-size: 10px; font-weight: 700; }
+.matrix-wrap .matrix-visual-row:hover, .matrix-wrap .matrix-visual-row.selected { background: #fff4c7; }
+.matrix-wrap .matrix-visual-row th { text-align: left; text-transform: uppercase; }
+.matrix-wrap .matrix-visual-row th b { display: inline-grid; width: 19px; height: 19px; margin-right: 8px; place-items: center; vertical-align: middle; border: 1px solid rgba(17,20,22,.55); font-family: 'Barlow Condensed', sans-serif; font-size: 15px; }
+.matrix-wrap .matrix-visual-row strong { font-size: 9px; text-transform: uppercase; }
+.matrix-wrap .matrix-visual-row.muito strong { color: var(--red); }
 
 @media (max-width:600px) {
   .presentation-section.section-active { justify-content:flex-start; overflow-x:hidden; overflow-y:auto; padding:86px 48px 82px 20px; -webkit-overflow-scrolling:touch; }
@@ -177,4 +185,8 @@ body { overscroll-behavior: none; }
   .visual-table-row { min-height:28px; padding:4px 10px; font-size:9px; }
   .visual-table-row b { width:17px; height:17px; font-size:13px; }
   .visual-table-row strong { font-size:8px; }
+  .matrix-wrap .matrix-visual-heading th { padding: 4px 12px; font-size: 8px; }
+  .matrix-wrap .matrix-visual-row { font-size: 8px; }
+  .matrix-wrap .matrix-visual-row th b { width: 15px; height: 15px; font-size: 12px; }
+  .matrix-wrap .matrix-visual-row strong { font-size: 7px; }
 }
