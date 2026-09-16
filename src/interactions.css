@@ -57,6 +57,11 @@ body { overscroll-behavior: none; }
   .slide-rail button { grid-template-columns: 18px 24px 16px; }
 }
 
+@media (min-width: 601px) {
+  /* Keep the slide rail out of the reading area on wide layouts. */
+  .presentation-section { padding-right: clamp(112px, 12vw, 180px); }
+}
+
 @media (max-width: 600px) {
   .presentation-section { padding-right: 48px; }
   .slide-rail { top: auto; right: 14px; bottom: 64px; gap: 0; padding: 5px; transform: none; background: rgba(17,20,22,.86); box-shadow: 0 8px 24px rgba(0,0,0,.18); }
@@ -65,12 +70,47 @@ body { overscroll-behavior: none; }
 }
 
 @media (max-height: 820px) and (min-width: 601px) {
-  .presentation-section { padding-top: 88px; padding-bottom: 24px; }
-  .section-header { margin-bottom: 24px; }
-  .footer-rule { margin-top: 20px; }
-  .matrix-wrap th, .matrix-wrap td { padding-top: 7px; padding-bottom: 7px; }
-  .legend { margin-top: 12px; margin-bottom: 18px; }
-  .decision-tool { padding: 18px 22px; }
-  .attention-card { min-height: 220px; }
-  .gallery figure { min-height: 280px; }
+  .presentation-section { justify-content: flex-start; padding-top: 92px; padding-bottom: 16px; }
+  .hero.presentation-section { justify-content: center; }
+  .section-header { margin-bottom: 16px; }
+  .section-header h2 { font-size: clamp(42px, 4.6vw, 58px); }
+  .section-header p { margin-top: 9px; font-size: 14px; }
+  .footer-rule { margin-top: 10px; font-size: 9px; }
+  .flow-layout { gap: 34px; }
+  .step { padding: 13px 0; }
+  .critical-note { padding: 20px; }
+  .warning-band { margin-top: 18px; padding: 11px 16px; }
+  .conditions-layout { gap: 30px; }
+  .condition-list > div { grid-template-columns: 64px 1fr; padding: 8px 0; }
+  .condition-list p { font-size: 12px; }
+  .area-rule img { height: 140px; }
+  .area-rule > div { padding: 14px; }
+  .area-rule p { margin-top: 6px; font-size: 12px; }
+  .attention-message { margin-top: 14px; padding: 10px 14px; font-size: 11px; }
+  .fine-print { margin-top: 8px; font-size: 10px; }
+  .class-item { min-height: 170px; padding: 17px; }
+  .class-details { min-height: 120px; margin-top: 18px; }
+  .class-details h3 { font-size: 29px; }
+  .matrix-section .section-header { margin-bottom: 10px; }
+  .matrix-section .section-header h2 { font-size: clamp(38px, 4vw, 50px); }
+  .matrix-wrap { overflow: visible; flex: 0 0 auto; }
+  .matrix-wrap th, .matrix-wrap td { padding: 2px 12px; font-size: 10px; line-height: 1.05; }
+  .matrix-wrap tbody th { font-size: 11px; }
+  .matrix-wrap .status { width: 16px; height: 16px; }
+  .matrix-wrap .status svg { width: 10px; height: 10px; }
+  .legend { margin-top: 6px; margin-bottom: 7px; }
+  .decision-tool { padding: 8px 18px; gap: 12px; }
+  .decision-tool h3 { font-size: 22px; }
+  .decision-tool p { font-size: 10px; }
+  .decision-tool select { margin-top: 4px; padding: 7px 8px; }
+  .outcome { min-height: 44px; }
+  .matrix-section .fine-print { margin-top: 4px; font-size: 9px; line-height: 1.2; }
+  .matrix-section .footer-rule { margin-top: 3px; font-size: 8px; }
+  .attention-card { min-height: 210px; padding: 18px; }
+  .gallery figure { min-height: 250px; }
+  .final-call { margin-top: 18px; padding-top: 16px; }
 }
+
+.presentation-section { transition: none; transform: none; }
+.presentation-section:not(.section-active) { display: none; }
+.presentation-section.section-active { display: flex; transform: none; }
