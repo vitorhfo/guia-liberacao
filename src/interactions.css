@@ -235,6 +235,58 @@ body { overscroll-behavior: none; }
 .magic-bento-card:hover:not(.photo-card)::before { opacity:1; }
 .magic-bento-card.photo-card:hover { box-shadow:0 20px 34px rgba(17,20,22,.24),0 0 0 3px rgba(247,183,24,.25); }
 
+/* Camada visual comum: uma trama discreta dá unidade técnica sem competir com o conteúdo. */
+.presentation-section:not(.hero) { --section-signal:var(--orange); --tech-line:rgba(17,20,22,.075); isolation:isolate; }
+.presentation-section:not(.hero)::before { content:''; position:absolute; z-index:0; inset:0; pointer-events:none; opacity:.62; background-image:linear-gradient(var(--tech-line) 1px,transparent 1px),linear-gradient(90deg,var(--tech-line) 1px,transparent 1px); background-size:42px 42px; mask-image:linear-gradient(90deg,transparent,black 14%,black 86%,transparent); }
+.presentation-section:not(.hero)>* { position:relative; z-index:1; }
+.presentation-section .class-hover-popup { z-index:40; }
+.section-header { position:relative; }
+.section-header::after { content:''; display:block; width:46px; height:3px; margin-top:18px; border-radius:999px; background:var(--section-signal); box-shadow:0 0 16px color-mix(in srgb,var(--section-signal) 50%,transparent); }
+
+/* Fluxo: linhas de processo e blocos claros remetem a uma interface de produção. */
+.flow-section { --section-signal:#ed6a20; --tech-line:rgba(237,106,32,.11); background-image:radial-gradient(500px circle at 88% 12%,rgba(237,106,32,.13),transparent 62%); }
+.flow-section .steps { padding:4px 22px; border:1px solid rgba(17,20,22,.08); border-radius:20px; background:rgba(255,255,255,.38); box-shadow:0 18px 38px rgba(17,20,22,.06); }
+.flow-section .step { position:relative; }
+.flow-section .step::after { content:''; position:absolute; right:4px; top:50%; width:28px; height:1px; background:linear-gradient(90deg,transparent,var(--orange)); }
+.flow-section .critical-note { border:1px solid rgba(247,183,24,.28); box-shadow:0 18px 36px rgba(17,20,22,.18),inset 0 1px rgba(255,255,255,.08); }
+.flow-section .warning-band { box-shadow:0 10px 24px rgba(217,65,58,.22); }
+
+/* Condições: aspecto limpo de laboratório, com painéis suaves e detalhes de medição. */
+.conditions-section { --section-signal:#1f9c65; --tech-line:rgba(31,156,101,.085); background-image:radial-gradient(460px circle at 82% 14%,rgba(31,156,101,.1),transparent 64%); }
+.conditions-section .condition-list { padding:5px 20px; border:1px solid rgba(31,156,101,.12); border-radius:20px; background:rgba(255,255,255,.64); box-shadow:0 16px 34px rgba(17,20,22,.05); }
+.conditions-section .condition-list>div { transition:background .2s ease,transform .2s ease; }
+.conditions-section .condition-list>div:hover { border-radius:10px; background:rgba(31,156,101,.06); transform:translateX(4px); }
+.conditions-section .area-rule { border:1px solid rgba(247,183,24,.42); box-shadow:0 20px 40px rgba(17,20,22,.16); }
+.conditions-section .attention-message { border:1px solid rgba(217,65,58,.18); box-shadow:0 8px 20px rgba(217,65,58,.08); }
+
+/* Classes: fundo escuro com profundidade e cores das exigências preservadas. */
+.classes-section { --section-signal:var(--yellow); --tech-line:rgba(247,183,24,.11); background-image:radial-gradient(520px circle at 88% 14%,rgba(237,106,32,.16),transparent 65%),linear-gradient(135deg,#15191b,#1c2224); }
+.classes-section::before { opacity:.52; }
+.classes-section .class-scale { outline:1px solid rgba(247,183,24,.16); outline-offset:5px; }
+.classes-section .class-item { background-image:linear-gradient(135deg,rgba(255,255,255,.04),transparent 45%); }
+.classes-section .class-item.selected { box-shadow:inset 0 0 38px rgba(255,255,255,.12),0 0 26px color-mix(in srgb,var(--class-color) 36%,transparent); }
+.classes-section .class-details article.visible { padding:20px; border:1px solid rgba(255,255,255,.11); border-radius:18px; background:rgba(0,0,0,.18); backdrop-filter:blur(8px); }
+
+/* Matriz: leitura de dados reforçada por plano amarelo, painéis e sombras controladas. */
+.matrix-section { --section-signal:#a8491b; --tech-line:rgba(91,66,5,.12); background-image:radial-gradient(500px circle at 90% 12%,rgba(255,255,255,.34),transparent 64%),linear-gradient(135deg,#f8cb3f,#f2bb23); }
+.matrix-section .matrix-wrap { outline:1px solid rgba(255,255,255,.5); outline-offset:5px; }
+.matrix-section .legend { display:inline-flex; padding:8px 12px; border:1px solid rgba(17,20,22,.14); border-radius:999px; background:rgba(255,255,255,.34); box-shadow:0 7px 18px rgba(87,64,7,.1); }
+.matrix-section .decision-tool { background:linear-gradient(135deg,#111719,#20292d); }
+
+/* Atenção: superfícies claras e linhas quentes mantêm o alerta técnico sem excesso visual. */
+.attention-section { --section-signal:#d9413a; --tech-line:rgba(217,65,58,.085); background-image:radial-gradient(480px circle at 7% 15%,rgba(217,65,58,.09),transparent 64%); }
+.attention-section .attention-grid { padding:6px; border:1px solid rgba(217,65,58,.1); border-radius:22px; background:rgba(255,255,255,.34); }
+.attention-section .checklist-toggle { border-color:rgba(217,65,58,.42); border-radius:999px; box-shadow:0 8px 20px rgba(217,65,58,.1); transition:transform .2s ease,background .2s ease; }
+.attention-section .checklist-toggle:hover { color:#fff; background:var(--red); transform:translateY(-2px); }
+.attention-section .checklist { border:1px solid rgba(17,20,22,.08); border-radius:18px; box-shadow:0 12px 24px rgba(17,20,22,.06); }
+
+/* Exemplos: molduras escuras e detalhes vermelhos reforçam o caráter de não conformidade. */
+.examples-section { --section-signal:#ff655f; --tech-line:rgba(255,255,255,.075); background-image:radial-gradient(520px circle at 88% 16%,rgba(217,65,58,.18),transparent 65%),linear-gradient(135deg,#101517,#151c1f); }
+.examples-section::before { opacity:.42; }
+.examples-section .defect-gallery { padding:6px; border:1px solid rgba(255,255,255,.09); border-radius:22px; background:rgba(255,255,255,.035); }
+.examples-section .defect-gallery-card { outline:1px solid rgba(255,255,255,.07); outline-offset:3px; }
+.examples-section .final-call { padding:20px; border:1px solid rgba(247,183,24,.2); border-radius:18px; background:rgba(255,255,255,.035); }
+
 @media (max-width:600px) {
   .presentation-section.section-active { justify-content:flex-start; overflow-x:hidden; overflow-y:auto; padding:86px 48px 82px 20px; -webkit-overflow-scrolling:touch; }
   .hero.presentation-section.section-active { justify-content:center; }
