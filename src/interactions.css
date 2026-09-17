@@ -183,7 +183,7 @@ body { overscroll-behavior: none; }
 .outcome-context { grid-column:2; color:#c4cbcd; font-size:10px; }
 .outcome-reaction { position:absolute; pointer-events:none; }
 .reaction-release { inset:-22px; }
-.reaction-release i { position:absolute; top:var(--y); left:var(--x); width:7px; height:7px; border-radius:50%; background:#46df91; box-shadow:0 0 9px rgba(70,223,145,.9); animation:release-burst 1.8s cubic-bezier(.16,.76,.35,1) infinite; transform:translate(-50%,-50%) rotate(var(--angle)) translateX(0) scale(.25); }
+.reaction-release i { position:absolute; top:var(--y); left:var(--x); width:7px; height:7px; border-radius:50%; background:#46df91; box-shadow:0 0 9px rgba(70,223,145,.9); animation:release-burst 2.4s cubic-bezier(.16,.76,.35,1) infinite; transform:translate(-50%,-50%) rotate(var(--angle)) translateX(0) scale(.25); }
 .reaction-release i:nth-child(3n) { width:5px; height:5px; background:#c8ff6f; }
 .reaction-release i:nth-child(2n) { animation-delay:.07s; }
 .reaction-release i:nth-child(4n) { animation-delay:.13s; }
