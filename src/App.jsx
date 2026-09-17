@@ -315,6 +315,32 @@ function App() {
     go(deltaX < 0 ? active + 1 : active - 1);
   };
 
+  // Atualiza variáveis CSS para que brilhos e cartões acompanhem o cursor sem recriar a tela.
+  const updateHoverParallax = (event) => {
+    if (event.pointerType === 'touch') return;
+    const element = event.currentTarget;
+    const bounds = element.getBoundingClientRect();
+    const x = (event.clientX - bounds.left) / bounds.width;
+    const y = (event.clientY - bounds.top) / bounds.height;
+    element.style.setProperty('--pointer-x', `${x * 100}%`);
+    element.style.setProperty('--pointer-y', `${y * 100}%`);
+    element.style.setProperty('--parallax-x', `${(x - .5) * 22}px`);
+    element.style.setProperty('--parallax-y', `${(y - .5) * 16}px`);
+    element.style.setProperty('--tilt-x', `${(x - .5) * 5}deg`);
+    element.style.setProperty('--tilt-y', `${(y - .5) * -5}deg`);
+  };
+
+  // Centraliza novamente os efeitos quando o cursor deixa a área interativa.
+  const resetHoverParallax = (event) => {
+    const element = event.currentTarget;
+    element.style.setProperty('--pointer-x', '50%');
+    element.style.setProperty('--pointer-y', '50%');
+    element.style.setProperty('--parallax-x', '0px');
+    element.style.setProperty('--parallax-y', '0px');
+    element.style.setProperty('--tilt-x', '0deg');
+    element.style.setProperty('--tilt-y', '0deg');
+  };
+
   // Ativa a navegação por teclado e a tecla Esc para fechar uma galeria aberta.
   useEffect(() => {
     const onKey = (event) => {
@@ -411,10 +437,10 @@ function App() {
       </aside>
 
       {/* Slide 1: introdução e entrada do guia. */}
-      <section id="inicio" className={`hero presentation-section ${active === 0 ? 'section-active' : ''}`}>
+      <section id="inicio" className={`hero presentation-section ${active === 0 ? 'section-active' : ''}`} onPointerMove={updateHoverParallax} onPointerLeave={resetHoverParallax}>
         <div className="hero-photo" role="img" aria-label="Equipamento Volvo amarelo em campo" />
         <div className="hero-overlay" />
-        <div className="infinite-spiral" aria-hidden="true" />
+        <div className="hero-tech-grid" aria-hidden="true" />
         <div className="hero-content">
           <p className="kicker">GUIA DE INSPEÇÃO</p>
           <h1>Requisitos de<br /><em>superfície pintada</em></h1>
@@ -495,11 +521,11 @@ function App() {
       <section id="atencao" className={`presentation-section attention-section ${active === 5 ? 'section-active' : ''}`}>
         <SectionHeader eyebrow="03" title="Pontos de atenção" text="Todos os exemplos abaixo são casos de reprova." />
         <div className="attention-grid magic-bento">
-          <article className="attention-card photo-card magic-bento-card"><img src="/assets/weld.jpg" alt="Ponto de solda e canto de peça" /><p>Olhar com atenção as bordas, quinas internas e regiões onde a tinta tende a acumular.</p></article>
-          <article className="attention-card photo-card magic-bento-card"><img src="/assets/bubbles.jpg" alt="Peça pintada com bolhas" /><p>Verificar locais onde a peça foi apoiada, pendurada ou tocada durante o processo.</p></article>
-          <article className="attention-card magic-bento-card"><Paintbrush className="card-icon" size={38} /><h3>Falhas e resíduos</h3><p>Verificar se contém falhas de pintura e resíduos na peça, como sujeira.</p></article>
-          <article className="attention-card magic-bento-card"><ThermometerSun className="card-icon" size={38} /><h3>Forno e camadas</h3><p>Verificar a temperatura e a velocidade do forno, além do nível de camadas, para evitar desplacamento.</p></article>
-          <article className="attention-card magic-bento-card"><Eye className="card-icon" size={38} /><h3>Cor e brilho</h3><p>Verificar desvios de cor e brilho, bem como respingos na superfície.</p></article>
+          <article className="attention-card photo-card magic-bento-card" onPointerMove={updateHoverParallax} onPointerLeave={resetHoverParallax}><img src="/assets/weld.jpg" alt="Ponto de solda e canto de peça" /><p>Olhar com atenção as bordas, quinas internas e regiões onde a tinta tende a acumular.</p></article>
+          <article className="attention-card photo-card magic-bento-card" onPointerMove={updateHoverParallax} onPointerLeave={resetHoverParallax}><img src="/assets/bubbles.jpg" alt="Peça pintada com bolhas" /><p>Verificar locais onde a peça foi apoiada, pendurada ou tocada durante o processo.</p></article>
+          <article className="attention-card magic-bento-card" onPointerMove={updateHoverParallax} onPointerLeave={resetHoverParallax}><Paintbrush className="card-icon" size={38} /><h3>Falhas e resíduos</h3><p>Verificar se contém falhas de pintura e resíduos na peça, como sujeira.</p></article>
+          <article className="attention-card magic-bento-card" onPointerMove={updateHoverParallax} onPointerLeave={resetHoverParallax}><ThermometerSun className="card-icon" size={38} /><h3>Forno e camadas</h3><p>Verificar a temperatura e a velocidade do forno, além do nível de camadas, para evitar desplacamento.</p></article>
+          <article className="attention-card magic-bento-card" onPointerMove={updateHoverParallax} onPointerLeave={resetHoverParallax}><Eye className="card-icon" size={38} /><h3>Cor e brilho</h3><p>Verificar desvios de cor e brilho, bem como respingos na superfície.</p></article>
         </div>
         <button className="checklist-toggle" onClick={() => setShowChecklist(!showChecklist)}>{showChecklist ? 'Ocultar checklist' : 'Abrir checklist de inspeção'} <span>{showChecklist ? '−' : '+'}</span></button>
         {showChecklist && <div className="checklist"><label><input type="checkbox" /> Bordas, quinas internas e áreas de acúmulo verificadas</label><label><input type="checkbox" /> Pontos de apoio, gancho ou contato verificados</label><label><input type="checkbox" /> Falhas, sujeira, cor, brilho e respingos verificados</label><label><input type="checkbox" /> Condições de forno e camadas verificadas</label></div>}

@@ -211,12 +211,14 @@ body { overscroll-behavior: none; }
 .gooey-nav button.active::before { opacity:1; transform:scale(1); }
 .gooey-nav button:hover:not(.active) { color:#fff; transform:translateY(-1px); }
 
-/* Espiral contínua no fundo da abertura para criar profundidade sem esconder a fotografia. */
+/* Camada técnica da abertura: a grade e o brilho se deslocam suavemente com o cursor. */
+.hero { --pointer-x:50%; --pointer-y:50%; --parallax-x:0px; --parallax-y:0px; }
 .hero-content,.hero .footer-rule { position:relative; z-index:1; }
-.infinite-spiral { position:absolute; z-index:0; top:50%; right:-10vw; width:min(62vw,760px); aspect-ratio:1; border-radius:50%; opacity:.5; pointer-events:none; transform:translateY(-50%); overflow:hidden; mask-image:radial-gradient(circle,transparent 0 9%,#000 10% 69%,transparent 70%); }
-.infinite-spiral::before { content:''; position:absolute; inset:0; border-radius:inherit; background:repeating-conic-gradient(from 0deg,rgba(247,183,24,0) 0deg 10deg,rgba(247,183,24,.82) 12deg 14deg,rgba(255,255,255,.18) 15deg 16deg,rgba(247,183,24,0) 18deg 31deg); animation:spiral-turn 20s linear infinite; }
-.infinite-spiral::after { content:''; position:absolute; inset:13%; border:1px solid rgba(247,183,24,.42); border-radius:inherit; box-shadow:0 0 30px rgba(247,183,24,.2),inset 0 0 40px rgba(247,183,24,.1); }
-@keyframes spiral-turn { to { transform:rotate(360deg); } }
+.hero::after { content:''; position:absolute; z-index:0; inset:0; pointer-events:none; background:radial-gradient(440px circle at var(--pointer-x) var(--pointer-y),rgba(247,183,24,.2),transparent 64%); mix-blend-mode:screen; transition:background .16s ease-out; }
+.hero-tech-grid { position:absolute; z-index:0; top:-8%; right:-8%; width:min(58vw,760px); height:116%; pointer-events:none; opacity:.42; background-image:linear-gradient(rgba(247,183,24,.18) 1px,transparent 1px),linear-gradient(90deg,rgba(247,183,24,.18) 1px,transparent 1px); background-size:34px 34px; mask-image:linear-gradient(90deg,transparent,black 34%,black 88%,transparent); transform:perspective(900px) rotateY(-20deg) rotateX(5deg) translate3d(var(--parallax-x),var(--parallax-y),0); transition:transform .16s ease-out; }
+.hero-tech-grid::before { content:''; position:absolute; inset:12% 12% 12% 8%; border:1px solid rgba(247,183,24,.52); box-shadow:0 0 26px rgba(247,183,24,.2),inset 0 0 34px rgba(247,183,24,.1); background:linear-gradient(120deg,transparent 0 42%,rgba(247,183,24,.12) 50%,transparent 58%); animation:tech-scan 6s linear infinite; }
+.hero-tech-grid::after { content:''; position:absolute; top:30%; left:28%; width:12px; aspect-ratio:1; border-radius:50%; background:#f7b718; box-shadow:0 0 0 7px rgba(247,183,24,.13),0 0 25px rgba(247,183,24,.88); }
+@keyframes tech-scan { from { background-position:-220px 0; } to { background-position:440px 0; } }
 
 /* Borda luminosa da consulta, com movimento lento para reforçar que o resultado é interativo. */
 .border-glow { position:relative; isolation:isolate; overflow:visible; border-radius:20px; }
@@ -225,13 +227,13 @@ body { overscroll-behavior: none; }
 @property --glow-angle { syntax:'<angle>'; initial-value:0deg; inherits:false; }
 @keyframes border-glow-spin { to { --glow-angle:360deg; } }
 
-/* Cartões de atenção com luz interna e resposta de elevação inspiradas no Magic Bento. */
+/* Cartões de atenção com brilho e parallax no hover, inspirados no Magic Bento. */
 .magic-bento { gap:14px; }
-.magic-bento-card { position:relative; isolation:isolate; overflow:hidden; border:1px solid rgba(17,20,22,.08); border-top:4px solid var(--yellow); box-shadow:0 10px 20px rgba(17,20,22,.08); transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s ease,border-color .35s ease; }
-.magic-bento-card:not(.photo-card)::before { content:''; position:absolute; z-index:-1; width:180px; height:180px; border-radius:50%; top:-90px; right:-68px; background:radial-gradient(circle,rgba(247,183,24,.3),rgba(247,183,24,0) 68%); animation:bento-light 7s ease-in-out infinite alternate; }
-.magic-bento-card:hover { z-index:2; transform:translateY(-7px) scale(1.015); border-color:rgba(237,106,32,.48); box-shadow:0 20px 34px rgba(17,20,22,.2),0 0 0 3px rgba(247,183,24,.16); }
+.magic-bento-card { --pointer-x:50%; --pointer-y:50%; --tilt-x:0deg; --tilt-y:0deg; position:relative; isolation:isolate; overflow:hidden; border:1px solid rgba(17,20,22,.08); border-top:4px solid var(--yellow); box-shadow:0 10px 20px rgba(17,20,22,.08); transform-style:preserve-3d; transition:transform .16s ease-out,box-shadow .25s ease,border-color .25s ease; }
+.magic-bento-card:not(.photo-card)::before { content:''; position:absolute; z-index:-1; inset:-1px; background:radial-gradient(180px circle at var(--pointer-x) var(--pointer-y),rgba(247,183,24,.35),transparent 70%); opacity:0; transition:opacity .2s ease; }
+.magic-bento-card:hover { z-index:2; transform:perspective(700px) translateY(-7px) rotateX(var(--tilt-y)) rotateY(var(--tilt-x)); border-color:rgba(237,106,32,.48); box-shadow:0 20px 34px rgba(17,20,22,.2),0 0 0 3px rgba(247,183,24,.16); }
+.magic-bento-card:hover:not(.photo-card)::before { opacity:1; }
 .magic-bento-card.photo-card:hover { box-shadow:0 20px 34px rgba(17,20,22,.24),0 0 0 3px rgba(247,183,24,.25); }
-@keyframes bento-light { from { transform:translate(-18px,-8px) scale(.82); } to { transform:translate(42px,48px) scale(1.15); } }
 
 @media (max-width:600px) {
   .presentation-section.section-active { justify-content:flex-start; overflow-x:hidden; overflow-y:auto; padding:86px 48px 82px 20px; -webkit-overflow-scrolling:touch; }
@@ -245,7 +247,7 @@ body { overscroll-behavior: none; }
   .reaction-reject { right:8px; left:8px; }
   .reaction-reject i { width:8px; height:12px; }
   .reaction-review { inset:-5px; }
-  .infinite-spiral { right:-38vw; width:112vw; opacity:.35; }
+  .hero-tech-grid { right:-48vw; width:125vw; opacity:.25; }
   .gooey-nav { display:none; }
   .magic-bento-card:hover { transform:none; }
   .decision-tool > div:first-child, .criterion-note { grid-column:auto; }
@@ -298,5 +300,5 @@ body { overscroll-behavior: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .outcome-reaction *, .reaction-review i, .infinite-spiral::before, .border-glow::before, .magic-bento-card::before { animation:none; }
+  .outcome-reaction *, .reaction-review i, .hero-tech-grid::before, .border-glow::before { animation:none; }
 }
