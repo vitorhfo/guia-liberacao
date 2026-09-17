@@ -47,9 +47,9 @@ body { overscroll-behavior: none; }
 
 @keyframes reveal-up { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
-@keyframes swipe-hint-in { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
-@keyframes swipe-hint-out { to { opacity:0; transform:translateY(10px); } }
-@keyframes swipe-hint-gesture { 0%,100% { transform:translateX(-4px); } 50% { transform:translateX(4px); } }
+@keyframes swipe-hint-in { from { opacity:0; } to { opacity:1; } }
+@keyframes swipe-hint-out { to { opacity:0; } }
+@keyframes swipe-hint-gesture { 0%,100% { transform:translateX(-18px) rotate(-8deg); } 50% { transform:translateX(18px) rotate(8deg); } }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; scroll-snap-type: none; }
@@ -328,8 +328,9 @@ body { overscroll-behavior: none; }
   .footer-rule { flex:0 0 auto; }
   .floating-controls { display:none; }
   .slide-rail { display:none; }
-  .swipe-hint { position:fixed; z-index:30; right:20px; bottom:22px; left:20px; display:flex; align-items:center; justify-content:center; gap:10px; min-height:48px; padding:12px 16px; border:1px solid rgba(247,183,24,.72); border-radius:14px; color:#fff; background:rgba(17,20,22,.94); box-shadow:0 12px 28px rgba(0,0,0,.28); font-size:12px; font-weight:800; letter-spacing:.02em; pointer-events:none; animation:swipe-hint-in .35s ease-out both,swipe-hint-out .45s ease-in 3.7s forwards; }
-  .swipe-hint svg { flex:0 0 auto; color:var(--yellow); animation:swipe-hint-gesture 1.25s ease-in-out infinite; }
+  .swipe-hint { position:fixed; z-index:30; top:50%; left:50%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; width:min(210px,calc(100vw - 64px)); padding:22px 18px; border:1px solid rgba(247,183,24,.72); border-radius:18px; color:#fff; background:rgba(17,20,22,.94); box-shadow:0 16px 38px rgba(0,0,0,.35); font-size:13px; font-weight:800; letter-spacing:.02em; line-height:1.35; text-align:center; pointer-events:none; transform:translate(-50%,-50%); animation:swipe-hint-in .35s ease-out both,swipe-hint-out .45s ease-in 3.7s forwards; }
+  .swipe-hint-hand { display:grid; place-items:center; width:60px; height:60px; color:var(--yellow); }
+  .swipe-hint-hand svg { animation:swipe-hint-gesture 1.25s ease-in-out infinite; }
   .decision-tool { grid-template-columns:1fr; align-items:stretch; }
   .outcome { padding-right:74px; }
   .reaction-release { inset:-17px; }

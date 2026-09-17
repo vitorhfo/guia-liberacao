@@ -5,7 +5,6 @@ import { createPortal } from 'react-dom';
 import {
   AlertTriangle,
   ArrowDown,
-  ArrowLeftRight,
   ArrowUp,
   Check,
   ChevronLeft,
@@ -14,6 +13,7 @@ import {
   ClipboardCheck,
   Eye,
   GitBranch,
+  Hand,
   ImageOff,
   Layers3,
   Lightbulb,
@@ -460,7 +460,7 @@ function App() {
         {nav.map(({ label, Icon }, index) => <button key={label} className={active === index ? 'active' : ''} onClick={() => go(index)} aria-label={`Ir para ${label}`}><span>{String(index + 1).padStart(2, '0')}</span><i /><Icon size={15} /></button>)}
       </aside>
 
-      {showSwipeHint && <div className="swipe-hint" role="status"><ArrowLeftRight size={18} /><span>Deslize para os lados para navegar</span></div>}
+      {showSwipeHint && <div className="swipe-hint" role="status"><span className="swipe-hint-hand"><Hand size={44} strokeWidth={1.7} /></span><span>Deslize para o lado<br />para navegar</span></div>}
 
       {/* Slide 1: introdução e entrada do guia. */}
       <section id="inicio" className={`hero presentation-section ${active === 0 ? 'section-active' : ''}`} onPointerMove={updateHoverParallax} onPointerLeave={resetHoverParallax}>
