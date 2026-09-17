@@ -399,7 +399,7 @@ function App() {
       {/* Cabeçalho fixo: marca, navegação de desktop e contador do slide atual. */}
       <nav className="topbar" aria-label="Navegação da apresentação">
         <button className="brand" onClick={() => go(0)} aria-label="Voltar ao início"><span><ShieldCheck size={16} /></span> GUIA DE QUALIDADE</button>
-        <div className="nav-links">
+        <div className="nav-links gooey-nav">
           {nav.map(({ label, Icon }, index) => <button key={label} className={active === index ? 'active' : ''} onClick={() => go(index)}><Icon size={14} /><span>{label}</span><i /></button>)}
         </div>
         <span className="slide-counter">{String(active + 1).padStart(2, '0')} / 07</span>
@@ -414,6 +414,7 @@ function App() {
       <section id="inicio" className={`hero presentation-section ${active === 0 ? 'section-active' : ''}`}>
         <div className="hero-photo" role="img" aria-label="Equipamento Volvo amarelo em campo" />
         <div className="hero-overlay" />
+        <div className="infinite-spiral" aria-hidden="true" />
         <div className="hero-content">
           <p className="kicker">GUIA DE INSPEÇÃO</p>
           <h1>Requisitos de<br /><em>superfície pintada</em></h1>
@@ -476,7 +477,7 @@ function App() {
         <SectionHeader eyebrow="02.2" title="Defeitos e classes" text="A norma cruza aparência, grupo A–F, classe da superfície e quantidade. Escolha o defeito para consultar a regra correta." />
         <div className="matrix-wrap"><table><thead><tr><th>DEFEITO</th><th>TIPO</th><th>I · PRATICAMENTE INVISÍVEL</th><th>II · POUCO VISÍVEL</th><th>III · CLARAMENTE VISÍVEL</th></tr></thead><tbody>{defects.map((item) => <tr key={item.name} className={selectedDefect === item.name ? 'chosen' : ''} onClick={() => setSelectedDefect(item.name)}><th>{item.name}</th><td>{item.type}</td>{item.type === 'Visual' ? <><td>{item.visual.pouco.length ? item.visual.pouco.join('/') : '—'}</td><td>{item.visual.visivel.length ? item.visual.visivel.join('/') : '—'}</td><td>{item.visual.muito.length ? item.visual.muito.join('/') : '—'}</td></> : <td colSpan="3">{item.type === 'Mensurável' ? 'Medir em mm para enquadrar no grupo A–F' : item.policy === 'block' ? 'Não liberar automaticamente' : 'Comparar com o padrão aprovado'}</td>}</tr>)}</tbody></table></div>
         <div className="legend"><span><Status value="✓" /> PODE LIBERAR</span><span><Status value="!" /> LIBERAR CONDICIONADO / AVALIAR</span><span><Status value="✕" /> NÃO LIBERAR</span></div>
-        <div className="decision-tool">
+        <div className="decision-tool border-glow">
           <div className="decision-intro"><span className="eyebrow">DECISÃO PELA NORMA</span><h3>Pode liberar ou não?</h3><p>Para defeitos visuais, informe a aparência e a quantidade. Para os mensuráveis, escolha a faixa simples de milímetros.</p></div>
           <label>Defeito<select value={selectedDefect} onChange={(event) => setSelectedDefect(event.target.value)}>{defects.map((item) => <option key={item.name}>{item.name}</option>)}</select></label>
           <label>Classe da superfície<select value={selectedSurfaceClass} onChange={(event) => setSelectedSurfaceClass(event.target.value)}>{surfaceClasses.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select></label>
@@ -493,12 +494,12 @@ function App() {
       {/* Slide 6: pontos críticos de inspeção e checklist opcional. */}
       <section id="atencao" className={`presentation-section attention-section ${active === 5 ? 'section-active' : ''}`}>
         <SectionHeader eyebrow="03" title="Pontos de atenção" text="Todos os exemplos abaixo são casos de reprova." />
-        <div className="attention-grid">
-          <article className="attention-card photo-card"><img src="/assets/weld.jpg" alt="Ponto de solda e canto de peça" /><p>Olhar com atenção as bordas, quinas internas e regiões onde a tinta tende a acumular.</p></article>
-          <article className="attention-card photo-card"><img src="/assets/bubbles.jpg" alt="Peça pintada com bolhas" /><p>Verificar locais onde a peça foi apoiada, pendurada ou tocada durante o processo.</p></article>
-          <article className="attention-card"><Paintbrush className="card-icon" size={38} /><h3>Falhas e resíduos</h3><p>Verificar se contém falhas de pintura e resíduos na peça, como sujeira.</p></article>
-          <article className="attention-card"><ThermometerSun className="card-icon" size={38} /><h3>Forno e camadas</h3><p>Verificar a temperatura e a velocidade do forno, além do nível de camadas, para evitar desplacamento.</p></article>
-          <article className="attention-card"><Eye className="card-icon" size={38} /><h3>Cor e brilho</h3><p>Verificar desvios de cor e brilho, bem como respingos na superfície.</p></article>
+        <div className="attention-grid magic-bento">
+          <article className="attention-card photo-card magic-bento-card"><img src="/assets/weld.jpg" alt="Ponto de solda e canto de peça" /><p>Olhar com atenção as bordas, quinas internas e regiões onde a tinta tende a acumular.</p></article>
+          <article className="attention-card photo-card magic-bento-card"><img src="/assets/bubbles.jpg" alt="Peça pintada com bolhas" /><p>Verificar locais onde a peça foi apoiada, pendurada ou tocada durante o processo.</p></article>
+          <article className="attention-card magic-bento-card"><Paintbrush className="card-icon" size={38} /><h3>Falhas e resíduos</h3><p>Verificar se contém falhas de pintura e resíduos na peça, como sujeira.</p></article>
+          <article className="attention-card magic-bento-card"><ThermometerSun className="card-icon" size={38} /><h3>Forno e camadas</h3><p>Verificar a temperatura e a velocidade do forno, além do nível de camadas, para evitar desplacamento.</p></article>
+          <article className="attention-card magic-bento-card"><Eye className="card-icon" size={38} /><h3>Cor e brilho</h3><p>Verificar desvios de cor e brilho, bem como respingos na superfície.</p></article>
         </div>
         <button className="checklist-toggle" onClick={() => setShowChecklist(!showChecklist)}>{showChecklist ? 'Ocultar checklist' : 'Abrir checklist de inspeção'} <span>{showChecklist ? '−' : '+'}</span></button>
         {showChecklist && <div className="checklist"><label><input type="checkbox" /> Bordas, quinas internas e áreas de acúmulo verificadas</label><label><input type="checkbox" /> Pontos de apoio, gancho ou contato verificados</label><label><input type="checkbox" /> Falhas, sujeira, cor, brilho e respingos verificados</label><label><input type="checkbox" /> Condições de forno e camadas verificadas</label></div>}
