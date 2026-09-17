@@ -1,5 +1,6 @@
 // Hooks do React que controlam navegação, consulta, galerias e interações por toque.
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 // Ícones usados na navegação, nos indicadores de status e nos cartões de inspeção.
 import {
   AlertTriangle,
@@ -264,6 +265,7 @@ function App() {
   const [hoveredClass, setHoveredClass] = useState(null);
   const [classPreviewPosition, setClassPreviewPosition] = useState({ x: 0, y: 0 });
   const classHoverTimer = useRef(null);
+  const classPointerType = useRef('mouse');
   const touchStart = useRef(null);
   // Estado da ferramenta de decisão baseada nas normas.
   const [selectedDefect, setSelectedDefect] = useState('Escorrido de tinta');
@@ -306,7 +308,7 @@ function App() {
     }
     setSelectedClass(id);
     setHoveredClass(null);
-    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) startClassPreview(id, event);
+    if (classPointerType.current === 'mouse') startClassPreview(id, event);
   };
 
   // Guarda o início do toque. Galerias ignoram o deslize para preservar a interação com as fotos.
@@ -501,12 +503,12 @@ function App() {
       <section id="classes" className={`presentation-section classes-section ${active === 3 ? 'section-active' : ''}`}>
         <SectionHeader eyebrow="02" title="Classificação das superfícies" text="Passe o mouse sobre uma classe para ver onde a peça fica na máquina." />
         <div className="class-scale" aria-label="Escala de exigência estética">
-          {classes.map((item, index) => <button key={item.id} className={`class-item class-${item.id} ${selectedClass === item.id ? 'selected' : ''}`} onClick={(event) => chooseSurfaceClass(item.id, event)} onPointerDown={(event) => { if (event.pointerType !== 'mouse') setClassPreviewPosition({ x: event.clientX, y: event.clientY }); }} onPointerEnter={(event) => { if (event.pointerType === 'mouse' && item.id === selectedClass) startClassPreview(item.id, event); }} onPointerMove={(event) => { if (event.pointerType === 'mouse' && item.id === selectedClass) setClassPreviewPosition({ x: event.clientX, y: event.clientY }); }} onPointerLeave={stopClassPreview} onBlur={stopClassPreview}><span className="class-number">{item.id}</span><span className="class-label">{item.label}</span><small>{index === 0 ? 'MAIOR EXIGÊNCIA ESTÉTICA' : index === 3 ? 'MENOR EXIGÊNCIA ESTÉTICA' : ''}</small></button>)}
+          {classes.map((item, index) => <button key={item.id} className={`class-item class-${item.id} ${selectedClass === item.id ? 'selected' : ''}`} onClick={(event) => chooseSurfaceClass(item.id, event)} onPointerDown={(event) => { classPointerType.current = event.pointerType; if (event.pointerType !== 'mouse') setClassPreviewPosition({ x: event.clientX, y: event.clientY }); }} onPointerEnter={(event) => { if (event.pointerType === 'mouse' && item.id === selectedClass) startClassPreview(item.id, event); }} onPointerMove={(event) => { if (event.pointerType === 'mouse' && item.id === selectedClass) setClassPreviewPosition({ x: event.clientX, y: event.clientY }); }} onPointerLeave={stopClassPreview} onBlur={stopClassPreview}><span className="class-number">{item.id}</span><span className="class-label">{item.label}</span><small>{index === 0 ? 'MAIOR EXIGÊNCIA ESTÉTICA' : index === 3 ? 'MENOR EXIGÊNCIA ESTÉTICA' : ''}</small></button>)}
         </div>
         <div className="class-details">
           <article className={`visible class-detail-${displayClass.id}`} style={{ '--class-color': `var(--class-${displayClass.id})` }}><span>CLASSE {displayClass.id}</span><h3>{displayClass.label}</h3><p>{displayClass.detail}</p><p className="example"><b>Exemplo de aplicação</b>{displayClass.example}</p></article>
         </div>
-        {previewClass && <aside className="class-hover-popup" style={previewStyle}><div className="class-hover-popup-title"><span>CLASSE {previewClass.id}</span><strong>{previewClass.label}</strong></div>{previewClass.image ? <img src={previewClass.image} alt={previewClass.imageAlt} /> : <div className="class-hover-popup-hidden"><Eye size={34} /><span>Oculta após a montagem</span></div>}<p>{previewClass.image ? 'Local da peça indicado na máquina.' : 'Esta região não fica visível após a montagem.'}</p></aside>}
+        {previewClass && createPortal(<aside className="class-hover-popup" style={previewStyle}><div className="class-hover-popup-title"><span>CLASSE {previewClass.id}</span><strong>{previewClass.label}</strong></div>{previewClass.image ? <img src={previewClass.image} alt={previewClass.imageAlt} /> : <div className="class-hover-popup-hidden"><Eye size={34} /><span>Oculta após a montagem</span></div>}<p>{previewClass.image ? 'Local da peça indicado na máquina.' : 'Esta região não fica visível após a montagem.'}</p></aside>, document.body)}
         <FooterRule />
       </section>
 
