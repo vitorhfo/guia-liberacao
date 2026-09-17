@@ -297,6 +297,18 @@ function App() {
     setHoveredClass(null);
   };
 
+  // Seleciona a classe e inicia a prévia no desktop mesmo quando o mouse já está sobre o botão.
+  const chooseSurfaceClass = (id, event) => {
+    setClassPreviewPosition({ x: event.clientX, y: event.clientY });
+    if (selectedClass === id) {
+      setHoveredClass(id);
+      return;
+    }
+    setSelectedClass(id);
+    setHoveredClass(null);
+    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) startClassPreview(id, event);
+  };
+
   // Guarda o início do toque. Galerias ignoram o deslize para preservar a interação com as fotos.
   const startSwipe = (event) => {
     if (openGallery) return;
@@ -489,7 +501,7 @@ function App() {
       <section id="classes" className={`presentation-section classes-section ${active === 3 ? 'section-active' : ''}`}>
         <SectionHeader eyebrow="02" title="Classificação das superfícies" text="Passe o mouse sobre uma classe para ver onde a peça fica na máquina." />
         <div className="class-scale" aria-label="Escala de exigência estética">
-          {classes.map((item, index) => <button key={item.id} className={`class-item class-${item.id} ${selectedClass === item.id ? 'selected' : ''}`} onClick={(event) => { setClassPreviewPosition({ x: event.clientX, y: event.clientY }); if (selectedClass === item.id) setHoveredClass(item.id); else { setSelectedClass(item.id); setHoveredClass(null); } }} onPointerDown={(event) => { if (event.pointerType !== 'mouse') setClassPreviewPosition({ x: event.clientX, y: event.clientY }); }} onMouseEnter={(event) => { if (item.id === selectedClass) startClassPreview(item.id, event); }} onMouseMove={(event) => { if (item.id === selectedClass) setClassPreviewPosition({ x: event.clientX, y: event.clientY }); }} onMouseLeave={stopClassPreview} onBlur={stopClassPreview}><span className="class-number">{item.id}</span><span className="class-label">{item.label}</span><small>{index === 0 ? 'MAIOR EXIGÊNCIA ESTÉTICA' : index === 3 ? 'MENOR EXIGÊNCIA ESTÉTICA' : ''}</small></button>)}
+          {classes.map((item, index) => <button key={item.id} className={`class-item class-${item.id} ${selectedClass === item.id ? 'selected' : ''}`} onClick={(event) => chooseSurfaceClass(item.id, event)} onPointerDown={(event) => { if (event.pointerType !== 'mouse') setClassPreviewPosition({ x: event.clientX, y: event.clientY }); }} onPointerEnter={(event) => { if (event.pointerType === 'mouse' && item.id === selectedClass) startClassPreview(item.id, event); }} onPointerMove={(event) => { if (event.pointerType === 'mouse' && item.id === selectedClass) setClassPreviewPosition({ x: event.clientX, y: event.clientY }); }} onPointerLeave={stopClassPreview} onBlur={stopClassPreview}><span className="class-number">{item.id}</span><span className="class-label">{item.label}</span><small>{index === 0 ? 'MAIOR EXIGÊNCIA ESTÉTICA' : index === 3 ? 'MENOR EXIGÊNCIA ESTÉTICA' : ''}</small></button>)}
         </div>
         <div className="class-details">
           <article className={`visible class-detail-${displayClass.id}`} style={{ '--class-color': `var(--class-${displayClass.id})` }}><span>CLASSE {displayClass.id}</span><h3>{displayClass.label}</h3><p>{displayClass.detail}</p><p className="example"><b>Exemplo de aplicação</b>{displayClass.example}</p></article>
