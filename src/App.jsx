@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import {
   AlertTriangle,
   ArrowDown,
+  ArrowLeftRight,
   ArrowUp,
   Check,
   ChevronLeft,
@@ -261,6 +262,7 @@ function FooterRule() {
 function App() {
   // Estado da navegação e da prévia de imagem das classes.
   const [active, setActive] = useState(0);
+  const [showSwipeHint, setShowSwipeHint] = useState(true);
   const [selectedClass, setSelectedClass] = useState('1');
   const [hoveredClass, setHoveredClass] = useState(null);
   const [classPreviewPosition, setClassPreviewPosition] = useState({ x: 0, y: 0 });
@@ -326,6 +328,7 @@ function App() {
     const deltaY = touch.clientY - touchStart.current.y;
     touchStart.current = null;
     if (Math.abs(deltaX) < 58 || Math.abs(deltaX) <= Math.abs(deltaY)) return;
+    setShowSwipeHint(false);
     go(deltaX < 0 ? active + 1 : active - 1);
   };
 
@@ -372,6 +375,13 @@ function App() {
 
   // Evita que um temporizador de hover continue após o componente ser removido.
   useEffect(() => () => window.clearTimeout(classHoverTimer.current), []);
+
+  // Exibe a orientação de gesto apenas no primeiro acesso em telas móveis.
+  useEffect(() => {
+    if (!window.matchMedia('(max-width: 600px)').matches) return undefined;
+    const timer = window.setTimeout(() => setShowSwipeHint(false), 4200);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   // Transforma as escolhas do inspetor nos dados atuais de defeito, classe e grupo da norma.
   const defectCriterion = defects.find((item) => item.name === selectedDefect) ?? defects[0];
@@ -449,6 +459,8 @@ function App() {
       <aside className="slide-rail" aria-label="Paginação lateral">
         {nav.map(({ label, Icon }, index) => <button key={label} className={active === index ? 'active' : ''} onClick={() => go(index)} aria-label={`Ir para ${label}`}><span>{String(index + 1).padStart(2, '0')}</span><i /><Icon size={15} /></button>)}
       </aside>
+
+      {showSwipeHint && <div className="swipe-hint" role="status"><ArrowLeftRight size={18} /><span>Deslize para os lados para navegar</span></div>}
 
       {/* Slide 1: introdução e entrada do guia. */}
       <section id="inicio" className={`hero presentation-section ${active === 0 ? 'section-active' : ''}`} onPointerMove={updateHoverParallax} onPointerLeave={resetHoverParallax}>
