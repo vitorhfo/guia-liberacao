@@ -448,3 +448,86 @@ body { overscroll-behavior: none; }
 @media (prefers-reduced-motion: reduce) {
   .outcome-reaction *, .reaction-review i, .hero-tech-grid::before, .border-glow::before { animation:none; }
 }
+
+/* Tema claro BlueLight: elimina superfícies pretas para reduzir reflexos e manter o foco na inspeção. */
+:root {
+  --ink:#19335f;
+  --ink-2:#2e4d7e;
+  --paper:#f8fbff;
+  --muted:#435a7d;
+  --line:rgba(25,51,95,.16);
+}
+body { background:#f8fbff; }
+.topbar { color:#19335f; background:rgba(248,251,255,.96); border-bottom-color:rgba(65,117,252,.2); box-shadow:0 8px 24px rgba(39,78,135,.12); }
+.brand { color:#19335f; }
+.nav-links button { color:#50678b; }
+.nav-links button:hover,.nav-links button.active { color:#084AF3; }
+.slide-counter { color:#084AF3; }
+.gooey-nav { border-color:rgba(65,117,252,.2); background:rgba(230,239,255,.74); box-shadow:inset 0 1px rgba(255,255,255,.9),0 8px 20px rgba(39,78,135,.1); }
+
+.hero { color:#19335f; }
+.hero-photo { background:radial-gradient(760px circle at 84% 30%,rgba(65,117,252,.32),transparent 57%),linear-gradient(135deg,#f9fcff 0%,#dce9ff 55%,#b6d0ff 100%); }
+.hero-overlay { background:linear-gradient(90deg,rgba(250,253,255,.96) 0%,rgba(242,248,255,.84) 44%,rgba(231,240,255,.3) 82%),linear-gradient(0deg,rgba(228,239,255,.5),transparent 52%); }
+.hero .footer-rule { color:#435a7d; }
+.primary-button { color:#fff; background:#084AF3; border-color:#084AF3; }
+.primary-button:hover { color:#084AF3; background:#fff; border-color:#084AF3; }
+
+.critical-note,.area-rule { color:#19335f; background:#e7f0ff; border:1px solid rgba(65,117,252,.25); }
+.critical-note p { color:#435a7d; }
+.area-rule-visual { background:radial-gradient(180px circle at 68% 38%,rgba(65,117,252,.42),transparent 64%),linear-gradient(135deg,#dce9ff,#aecbff); }
+.area-rule-visual::before { border-color:rgba(25,51,95,.42); background:repeating-linear-gradient(90deg,rgba(25,51,95,.12) 0 1px,transparent 1px 28px),repeating-linear-gradient(rgba(25,51,95,.09) 0 1px,transparent 1px 28px); }
+.area-rule-visual::after { color:#19335f; }
+
+.classes-section { color:#19335f; background:#edf4ff; }
+.classes-section .section-header p,.class-details p { color:#435a7d; }
+.class-scale { border-color:rgba(25,51,95,.22); background:#f9fbff; }
+.class-item { color:#19335f; border-color:rgba(25,51,95,.22); background:rgba(255,255,255,.58); }
+.class-item:hover,.class-item.selected { color:#fff; background:var(--class-color); }
+.class-details .example { color:#435a7d; border-left-color:rgba(25,51,95,.2); }
+.class-details .example b { color:#19335f; }
+.classes-section .class-details article.visible { border-color:rgba(65,117,252,.22); background:rgba(255,255,255,.72); }
+
+.class-hover-popup { color:#19335f; background:#f8fbff; box-shadow:0 18px 48px rgba(39,78,135,.24); }
+.class-hover-popup-hidden,.class-hover-popup p { color:#435a7d; }
+.class-hover-popup::after { background:#f8fbff; }
+.class-location-diagram { background:radial-gradient(180px circle at 72% 24%,rgba(65,117,252,.32),transparent 65%),linear-gradient(135deg,#eff6ff,#c9dcff); }
+.class-location-diagram::before { background-image:linear-gradient(rgba(25,51,95,.12) 1px,transparent 1px),linear-gradient(90deg,rgba(25,51,95,.12) 1px,transparent 1px); }
+.location-frame { border-color:rgba(25,51,95,.64); box-shadow:inset 0 0 24px rgba(65,117,252,.16),0 0 20px rgba(65,117,252,.1); }
+.location-frame::before,.location-frame::after { border-color:rgba(25,51,95,.56); }
+.location-label { color:#19335f; }
+
+.matrix-wrap thead th { background:#2d5fc9; }
+.decision-tool,.matrix-section .decision-tool { color:#19335f; background:linear-gradient(135deg,#edf4ff,#d4e4ff); border:1px solid rgba(65,117,252,.24); }
+.decision-tool .eyebrow { color:#084AF3; }
+.decision-tool p,.decision-tool label,.outcome>span:last-child { color:#435a7d; }
+.decision-tool select,.outcome { color:#19335f; background:#fff; border-color:rgba(65,117,252,.38); }
+.criterion-note { border-top-color:rgba(25,51,95,.18); }
+.visibility-guide { background:rgba(65,117,252,.18); }
+
+.examples-section { color:#19335f; background:#edf4ff; }
+.examples-section .section-header p { color:#435a7d; }
+.examples-section .defect-gallery { border-color:rgba(65,117,252,.18); background:rgba(255,255,255,.48); }
+.examples-section .defect-gallery-card { background:#d8e7ff; outline-color:rgba(65,117,252,.16); }
+.final-call { border-top-color:rgba(25,51,95,.2); }
+.examples-section .final-call { border-color:rgba(65,117,252,.2); background:rgba(255,255,255,.62); }
+.gallery figure { background:#d8e7ff; }
+.attention-card.photo-card::after { background:linear-gradient(0deg,rgba(17,62,138,.78),rgba(24,90,190,.08) 65%); }
+.gallery figcaption,.defect-gallery-shade,.gallery-modal-grid figcaption { background:linear-gradient(0deg,rgba(17,62,138,.84),rgba(17,62,138,.05) 65%); }
+.gallery-modal-backdrop { background:rgba(225,237,255,.9); }
+.gallery-modal-panel { color:#19335f; background:#f8fbff; box-shadow:0 24px 80px rgba(39,78,135,.25); }
+.gallery-modal-close { color:#19335f; border-color:#8da9d8; }
+.gallery-modal-close:hover { color:#fff; background:#084AF3; }
+.floating-controls button { color:#084AF3; border-color:rgba(65,117,252,.35); background:#f8fbff; box-shadow:0 8px 20px rgba(39,78,135,.15); }
+
+/* Ajustes dos componentes interativos para manter seus painéis claros. */
+.slide-rail { background:rgba(248,251,255,.94); box-shadow:0 8px 24px rgba(39,78,135,.14); }
+.magic-bento-card:hover { box-shadow:0 20px 34px rgba(39,78,135,.16),0 0 0 3px rgba(65,117,252,.14); }
+.flow-section .critical-note { box-shadow:0 18px 36px rgba(39,78,135,.12),inset 0 1px rgba(255,255,255,.8); }
+.conditions-section .area-rule { box-shadow:0 20px 40px rgba(39,78,135,.14); }
+.examples-section { background-image:radial-gradient(520px circle at 88% 16%,rgba(65,117,252,.13),transparent 65%),linear-gradient(135deg,#edf4ff,#dceaff); }
+.classes-section { background-image:radial-gradient(520px circle at 88% 14%,rgba(65,117,252,.13),transparent 65%),linear-gradient(135deg,#edf4ff,#dceaff); }
+.classes-section .class-scale { outline-color:rgba(65,117,252,.18); }
+
+@media (max-width:600px) {
+  .swipe-hint { color:#19335f; border-color:rgba(65,117,252,.45); background:rgba(248,251,255,.97); box-shadow:0 16px 38px rgba(39,78,135,.2); }
+}
