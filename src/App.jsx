@@ -27,12 +27,12 @@ import {
   ZoomIn,
 } from 'lucide-react';
 
-// Classes visuais exibidas no slide “Classificação das superfícies” e suas imagens na máquina.
+// Classes visuais exibidas no slide “Classificação das superfícies” e suas posições genéricas de inspeção.
 const classes = [
-  { id: '1', label: 'Muito alta', detail: 'Visível no campo imediato de visão do observador.', example: 'Frente, painéis principais, regiões externas críticas', image: new URL('../img/classes/classe 1/classs1.png', import.meta.url).href, imageAlt: 'Área externa visível da máquina indicada em vermelho' },
-  { id: '2', label: 'Média', detail: 'Visível, porém afastada do campo imediato de visão.', example: 'Áreas visíveis secundárias ou de observação eventual', image: new URL('../img/classes/classe2/class2.png', import.meta.url).href, imageAlt: 'Área lateral da máquina indicada em vermelho' },
-  { id: '3', label: 'Baixa', detail: 'Não imediatamente visível.', example: 'Regiões internas, inferiores ou pouco aparentes', image: new URL('../img/classes/classe3/class3.png', import.meta.url).href, imageAlt: 'Área interna da máquina indicada em vermelho' },
-  { id: '4', label: 'Oculta', detail: 'Permanentemente oculta após montagem.', example: 'Áreas internas cobertas ou escondidas', image: null, imageAlt: null },
+  { id: '1', label: 'Muito alta', detail: 'Visível no campo imediato de visão do observador.', example: 'Frente, painéis principais, regiões externas críticas', location: 'Faces externas e pontos com maior exposição visual.' },
+  { id: '2', label: 'Média', detail: 'Visível, porém afastada do campo imediato de visão.', example: 'Áreas visíveis secundárias ou de observação eventual', location: 'Faces laterais e áreas externas de observação eventual.' },
+  { id: '3', label: 'Baixa', detail: 'Não imediatamente visível.', example: 'Regiões internas, inferiores ou pouco aparentes', location: 'Regiões internas, inferiores ou pouco aparentes.' },
+  { id: '4', label: 'Oculta', detail: 'Permanentemente oculta após montagem.', example: 'Áreas internas cobertas ou escondidas', location: 'Região interna coberta após a montagem final.' },
 ];
 
 // Limites oficiais da STD 120-0014 para cada classe de superfície e grupo de defeito A–F.
@@ -65,7 +65,7 @@ const defects = [
   { name: 'Desplacamento', type: 'Processo', reference: 'IT 177 · aderência e proteção', policy: 'block' },
 ];
 
-// Três escolhas visuais simples para o inspetor, associadas à escala Volvo I–III.
+// Três escolhas visuais simples para o inspetor, associadas à escala de visibilidade I–III.
 const visibilityLevels = [
   {
     id: 'pouco',
@@ -242,6 +242,15 @@ function OutcomeReaction({ outcome }) {
     return <span className="outcome-reaction reaction-reject" aria-hidden="true">{Array.from({ length: 11 }, (_, index) => <i key={index} style={{ '--delay': `${index * .14}s` }} />)}</span>;
   }
   return <span className="outcome-reaction reaction-review" aria-hidden="true"><i /><i /></span>;
+}
+
+// Esquema neutro que indica a posição de inspeção sem associar o guia a uma máquina de cliente.
+function ClassLocationDiagram({ item }) {
+  return <div className={`class-location-diagram class-location-${item.id}`} aria-label={`Mapa genérico: ${item.location}`}>
+    <span className="location-frame" />
+    <span className="location-zone" />
+    <span className="location-label">MAPA GENÉRICO DE INSPEÇÃO</span>
+  </div>;
 }
 
 // Cabeçalho reutilizável no início de cada seção da apresentação.
@@ -436,7 +445,7 @@ function App() {
     outcome = '✕';
     outcomeText = 'Não liberar';
     outcomeDetail = defectCriterion.name === 'Ferrugem'
-      ? 'A norma Volvo direciona corrosão para outra especificação técnica; o procedimento interno exige peça livre de ferrugem antes da pintura.'
+      ? 'A especificação técnica aplicável direciona corrosão para outro critério de avaliação; o procedimento interno exige peça livre de ferrugem antes da pintura.'
       : 'O procedimento IT 177 exige segregação e avaliação para decapagem; retoque não é permitido para esta não conformidade.';
   } else if (defectCriterion.policy === 'consult') {
     outcomeDetail = 'A STD 120-0014 não fixa grupo A–F para este defeito. Compare com o padrão aprovado e a especificação da peça antes de liberar.';
@@ -490,7 +499,7 @@ function App() {
 
       {/* Cabeçalho fixo: marca, navegação de desktop e contador do slide atual. */}
       <nav className="topbar" aria-label="Navegação da apresentação">
-        <button className="brand" onClick={() => go(0)} aria-label="Voltar ao início"><span><ShieldCheck size={16} /></span> GUIA DE QUALIDADE</button>
+        <button className="brand" onClick={() => go(0)} aria-label="Voltar ao início"><span>BL</span> BLUELIGHT <small>QUALIDADE</small></button>
         <div className="nav-links gooey-nav">
           {nav.map(({ label, Icon }, index) => <button key={label} className={active === index ? 'active' : ''} onClick={() => go(index)}><Icon size={14} /><span>{label}</span><i /></button>)}
         </div>
@@ -506,11 +515,11 @@ function App() {
 
       {/* Slide 1: introdução e entrada do guia. */}
       <section id="inicio" className={sectionClass('hero', 0)} onPointerMove={updateHoverParallax} onPointerLeave={resetHoverParallax}>
-        <div className="hero-photo" role="img" aria-label="Equipamento Volvo amarelo em campo" />
+        <div className="hero-photo" aria-hidden="true" />
         <div className="hero-overlay" />
         <div className="hero-tech-grid" aria-hidden="true" />
         <div className="hero-content">
-          <p className="kicker">GUIA DE INSPEÇÃO</p>
+          <p className="kicker">BLUELIGHT INDÚSTRIA · CAFELÂNDIA/SP</p>
           <h1>Requisitos de<br /><em>superfície pintada</em></h1>
           <p className="hero-copy">Critérios de avaliação visual aplicados após a pintura, incluindo classes e condições de inspeção.</p>
           <div className="hero-objective"><span>OBJETIVO DO MATERIAL</span><p>Padronizar as normas no setor, facilitando a identificação da classe, a avaliação do defeito e a tomada de decisão.</p></div>
@@ -546,7 +555,7 @@ function App() {
             <div><b><Eye /></b><p><strong>Visão lateral</strong><br />Pode avaliar ligeiramente de lado para cobrir ângulos.</p></div>
             <div><b><Ruler /></b><p><strong>Distância</strong><br />Avaliar a 1 m de distância.</p></div>
           </div>
-          <div className="area-rule"><img src="/assets/field.jpg" alt="Equipamento Volvo em ambiente industrial" /><div><span>AVALIAÇÃO EM ÁREA</span><p><strong>Classes 1</strong> Máximo de 2 defeitos<br /><i>Praticamente invisível</i></p><p><strong>Classes 2</strong> Máximo de 3 defeitos<br /><i>Pouco visível</i></p></div></div>
+          <div className="area-rule"><div className="area-rule-visual" role="img" aria-label="Representação técnica de tratamento e pintura industrial" /><div><span>AVALIAÇÃO EM ÁREA</span><p><strong>Classes 1</strong> Máximo de 2 defeitos<br /><i>Praticamente invisível</i></p><p><strong>Classes 2</strong> Máximo de 3 defeitos<br /><i>Pouco visível</i></p></div></div>
         </div>
         <div className="attention-message"><b>ATENÇÃO</b><span>DEFEITOS CLARAMENTE VISÍVEIS: REPROVAR</span></div>
         <p className="fine-print">Termos como “praticamente invisível”, “muito pouco visível” e “claramente visível” dependem da avaliação de inspetor experiente.</p>
@@ -555,14 +564,14 @@ function App() {
 
       {/* Slide 4: classes de superfície com prévia por hover ou segundo toque. */}
       <section id="classes" className={sectionClass('classes-section', 3)}>
-        <SectionHeader eyebrow="02" title="Classificação das superfícies" text="Passe o mouse sobre uma classe para ver onde a peça fica na máquina." />
+        <SectionHeader eyebrow="02" title="Classificação das superfícies" text="Passe o mouse sobre uma classe para ver a posição genérica de inspeção." />
         <div className="class-scale" aria-label="Escala de exigência estética">
           {classes.map((item, index) => <button key={item.id} className={`class-item class-${item.id} ${selectedClass === item.id ? 'selected' : ''}`} onClick={(event) => chooseSurfaceClass(item.id, event)} onPointerDown={(event) => { classPointerType.current = event.pointerType; if (event.pointerType !== 'mouse') setClassPreviewPosition({ x: event.clientX, y: event.clientY }); }} onPointerEnter={(event) => { if (event.pointerType === 'mouse' && item.id === selectedClass) startClassPreview(item.id, event); }} onPointerMove={(event) => { if (event.pointerType === 'mouse' && item.id === selectedClass) setClassPreviewPosition({ x: event.clientX, y: event.clientY }); }} onPointerLeave={stopClassPreview} onBlur={stopClassPreview}><span className="class-number">{item.id}</span><span className="class-label">{item.label}</span><small>{index === 0 ? 'MAIOR EXIGÊNCIA ESTÉTICA' : index === 3 ? 'MENOR EXIGÊNCIA ESTÉTICA' : ''}</small></button>)}
         </div>
         <div className="class-details">
           <article className={`visible class-detail-${displayClass.id}`} style={{ '--class-color': `var(--class-${displayClass.id})` }}><span>CLASSE {displayClass.id}</span><h3>{displayClass.label}</h3><p>{displayClass.detail}</p><p className="example"><b>Exemplo de aplicação</b>{displayClass.example}</p></article>
         </div>
-        {previewClass && createPortal(<aside className="class-hover-popup" style={previewStyle}><div className="class-hover-popup-title"><span>CLASSE {previewClass.id}</span><strong>{previewClass.label}</strong></div>{previewClass.image ? <img src={previewClass.image} alt={previewClass.imageAlt} /> : <div className="class-hover-popup-hidden"><Eye size={34} /><span>Oculta após a montagem</span></div>}<p>{previewClass.image ? 'Local da peça indicado na máquina.' : 'Esta região não fica visível após a montagem.'}</p></aside>, document.body)}
+        {previewClass && createPortal(<aside className="class-hover-popup" style={previewStyle}><div className="class-hover-popup-title"><span>CLASSE {previewClass.id}</span><strong>{previewClass.label}</strong></div><ClassLocationDiagram item={previewClass} /><p>{previewClass.location}</p></aside>, document.body)}
         <FooterRule />
       </section>
 
