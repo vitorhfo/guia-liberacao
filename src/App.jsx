@@ -262,7 +262,8 @@ function FooterRule() {
 function App() {
   // Estado da navegação e da prévia de imagem das classes.
   const [active, setActive] = useState(0);
-  const [showSwipeHint, setShowSwipeHint] = useState(true);
+  const [showIntro, setShowIntro] = useState(true);
+  const [showSwipeHint, setShowSwipeHint] = useState(false);
   const [selectedClass, setSelectedClass] = useState('1');
   const [hoveredClass, setHoveredClass] = useState(null);
   const [classPreviewPosition, setClassPreviewPosition] = useState({ x: 0, y: 0 });
@@ -287,6 +288,9 @@ function App() {
     const next = Math.max(0, Math.min(sections.length - 1, index));
     setActive(next);
   };
+
+  // Encerra a abertura e libera a apresentação completa.
+  const closeIntro = () => setShowIntro(false);
 
   // Abre a imagem da classe selecionada após um pequeno tempo de espera no mouse.
   const startClassPreview = (id, event) => {
@@ -315,14 +319,14 @@ function App() {
 
   // Guarda o início do toque. Galerias ignoram o deslize para preservar a interação com as fotos.
   const startSwipe = (event) => {
-    if (openGallery) return;
+    if (showIntro || openGallery) return;
     const touch = event.touches[0];
     touchStart.current = { x: touch.clientX, y: touch.clientY };
   };
 
   // Troca o slide somente em um deslize horizontal intencional; a rolagem vertical é preservada.
   const finishSwipe = (event) => {
-    if (!touchStart.current || openGallery) return;
+    if (!touchStart.current || showIntro || openGallery) return;
     const touch = event.changedTouches[0];
     const deltaX = touch.clientX - touchStart.current.x;
     const deltaY = touch.clientY - touchStart.current.y;
@@ -362,6 +366,10 @@ function App() {
   useEffect(() => {
     const onKey = (event) => {
       if (['INPUT', 'SELECT', 'TEXTAREA'].includes(event.target.tagName)) return;
+      if (showIntro) {
+        if (['Enter', ' ', 'Escape'].includes(event.key)) closeIntro();
+        return;
+      }
       if (openGallery) {
         if (event.key === 'Escape') { setOpenGallery(null); setExpandedGalleryImage(null); }
         return;
@@ -371,17 +379,24 @@ function App() {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [active, openGallery]);
+  }, [active, openGallery, showIntro]);
 
   // Evita que um temporizador de hover continue após o componente ser removido.
   useEffect(() => () => window.clearTimeout(classHoverTimer.current), []);
 
-  // Exibe a orientação de gesto apenas no primeiro acesso em telas móveis.
+  // Mostra a apresentação de marca antes do conteúdo principal.
   useEffect(() => {
-    if (!window.matchMedia('(max-width: 600px)').matches) return undefined;
-    const timer = window.setTimeout(() => setShowSwipeHint(false), 4200);
+    const timer = window.setTimeout(closeIntro, 4200);
     return () => window.clearTimeout(timer);
   }, []);
+
+  // Exibe a orientação de gesto após a abertura, apenas em telas móveis.
+  useEffect(() => {
+    if (showIntro || !window.matchMedia('(max-width: 600px)').matches) return undefined;
+    setShowSwipeHint(true);
+    const timer = window.setTimeout(() => setShowSwipeHint(false), 4200);
+    return () => window.clearTimeout(timer);
+  }, [showIntro]);
 
   // Transforma as escolhas do inspetor nos dados atuais de defeito, classe e grupo da norma.
   const defectCriterion = defects.find((item) => item.name === selectedDefect) ?? defects[0];
@@ -446,6 +461,18 @@ function App() {
   // Estrutura da apresentação: navegação, sete slides, galeria modal e controles anterior/próximo.
   return (
     <main onTouchStart={startSwipe} onTouchEnd={finishSwipe}>
+      {showIntro && <section className="site-intro" role="dialog" aria-modal="true" aria-label="Apresentação Blue Light e WV">
+        <div className="site-intro-grid" aria-hidden="true" />
+        <div className="site-intro-content">
+          <div className="site-intro-mark"><ShieldCheck size={22} /></div>
+          <p className="site-intro-kicker">QUEM SOMOS</p>
+          <h1><span>BLUE LIGHT</span><b>+</b><span>WV</span></h1>
+          <p className="site-intro-copy">Somos Blue Light e WV. Transformamos conhecimento técnico em experiências claras para decisões de qualidade.</p>
+          <button className="site-intro-skip" onClick={closeIntro}>Entrar no guia <ChevronRight size={16} /></button>
+        </div>
+        <div className="site-intro-progress" aria-hidden="true"><i /></div>
+      </section>}
+
       {/* Cabeçalho fixo: marca, navegação de desktop e contador do slide atual. */}
       <nav className="topbar" aria-label="Navegação da apresentação">
         <button className="brand" onClick={() => go(0)} aria-label="Voltar ao início"><span><ShieldCheck size={16} /></span> GUIA DE QUALIDADE</button>
