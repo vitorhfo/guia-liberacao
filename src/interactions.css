@@ -554,3 +554,33 @@ body { background:#f8fbff; }
 .matrix-section .section-header h2,.matrix-section .legend,.matrix-section .visual-table-row,.matrix-section .matrix-visual-row { color:#19335f; }
 .area-rule span,.area-rule strong,.final-call p { color:#084AF3; }
 .flow-section .step>span,.conditions-section .condition-list b,.card-index { color:#084AF3; }
+
+/* Contraste de leitura: regras finais para textos sobre os novos fundos claros. */
+.topbar .brand { color:#19335f; }
+.topbar .brand small { color:#435a7d; }
+.topbar .nav-links button,
+.topbar .nav-links button svg,
+.topbar .gooey-nav button,
+.topbar .gooey-nav button svg { color:#19335f; }
+.topbar .nav-links button:hover,
+.topbar .nav-links button.active,
+.topbar .nav-links button:hover svg,
+.topbar .nav-links button.active svg,
+.topbar .gooey-nav button:hover:not(.active),
+.topbar .gooey-nav button:hover:not(.active) svg { color:#084AF3; }
+.topbar .gooey-nav button.active,
+.topbar .gooey-nav button.active svg { color:#fff; }
+.slide-rail { border:1px solid rgba(65,117,252,.18); border-radius:14px; background:rgba(248,251,255,.86); }
+.slide-rail button { color:#435a7d; }
+.slide-rail button.active,.slide-rail button.active svg { color:#084AF3; }
+.slide-rail button.active i { background:#084AF3; }
+
+.site-intro-copy { color:#435a7d; }
+.site-intro-kicker,.site-intro h1 span:last-child,.site-intro h1 b { color:#084AF3; }
+.site-intro-progress { background:rgba(25,51,95,.16); }
+.site-intro-progress i { background:#084AF3; }
+
+.hero h1,.hero-copy,.hero-objective,.hero-objective p { color:#19335f; }
+.hero h1 em,.hero .kicker,.hero-objective span { color:#084AF3; }
+.matrix-wrap thead th { color:#fff; }
+.matrix-section .status-\! { color:#19335f; }
