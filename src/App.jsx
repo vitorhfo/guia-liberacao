@@ -478,6 +478,7 @@ function App() {
   const previewClass = classes.find((item) => item.id === hoveredClass);
   const previewStyle = previewClass ? {
     '--class-color': `var(--class-${previewClass.id})`,
+    '--class-foreground': previewClass.id === '3' ? '#19335f' : '#fff',
     left: Math.max(16, Math.min(classPreviewPosition.x + 20, window.innerWidth - 336)),
     top: Math.max(80, Math.min(classPreviewPosition.y + 20, window.innerHeight - 314)),
   } : undefined;
