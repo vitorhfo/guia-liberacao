@@ -262,6 +262,7 @@ function FooterRule() {
 function App() {
   // Estado da navegação e da prévia de imagem das classes.
   const [active, setActive] = useState(0);
+  const [slideMotion, setSlideMotion] = useState('forward');
   const [showIntro, setShowIntro] = useState(true);
   const [showSwipeHint, setShowSwipeHint] = useState(false);
   const [selectedClass, setSelectedClass] = useState('1');
@@ -286,6 +287,8 @@ function App() {
   // Troca de seção mantendo a navegação entre o primeiro e o último slide.
   const go = (index) => {
     const next = Math.max(0, Math.min(sections.length - 1, index));
+    if (next === active) return;
+    setSlideMotion(next > active ? 'forward' : 'back');
     setActive(next);
   };
 
@@ -490,7 +493,7 @@ function App() {
       {showSwipeHint && <div className="swipe-hint" role="status"><span className="swipe-hint-hand"><Hand size={44} strokeWidth={1.7} /></span><span>Deslize para o lado<br />para navegar</span></div>}
 
       {/* Slide 1: introdução e entrada do guia. */}
-      <section id="inicio" className={`hero presentation-section ${active === 0 ? 'section-active' : ''}`} onPointerMove={updateHoverParallax} onPointerLeave={resetHoverParallax}>
+      <section id="inicio" className={`hero presentation-section ${active === 0 ? `section-active slide-motion-${slideMotion}` : ''}`} onPointerMove={updateHoverParallax} onPointerLeave={resetHoverParallax}>
         <div className="hero-photo" role="img" aria-label="Equipamento Volvo amarelo em campo" />
         <div className="hero-overlay" />
         <div className="hero-tech-grid" aria-hidden="true" />
@@ -505,7 +508,7 @@ function App() {
       </section>
 
       {/* Slide 2: fluxo de inspeção e lembretes obrigatórios para decisão. */}
-      <section id="fluxo" className={`presentation-section flow-section ${active === 1 ? 'section-active' : ''}`}>
+      <section id="fluxo" className={`presentation-section flow-section ${active === 1 ? `section-active slide-motion-${slideMotion}` : ''}`}>
         <SectionHeader eyebrow="ITS" title="Fluxo integrado de inspeção" text="Como decidir usando as duas normas" />
         <div className="flow-layout">
           <div className="steps">
@@ -520,7 +523,7 @@ function App() {
       </section>
 
       {/* Slide 3: condições controladas de avaliação presentes nas instruções de trabalho. */}
-      <section id="condicoes" className={`presentation-section conditions-section ${active === 2 ? 'section-active' : ''}`}>
+      <section id="condicoes" className={`presentation-section conditions-section ${active === 2 ? `section-active slide-motion-${slideMotion}` : ''}`}>
         <SectionHeader eyebrow="ITS 176 + ITS 177" title="Condições padrão de avaliação" text="A inspeção visual depende de condições controladas." />
         <div className="conditions-layout">
           <div className="condition-list">
@@ -539,7 +542,7 @@ function App() {
       </section>
 
       {/* Slide 4: classes de superfície com prévia por hover ou segundo toque. */}
-      <section id="classes" className={`presentation-section classes-section ${active === 3 ? 'section-active' : ''}`}>
+      <section id="classes" className={`presentation-section classes-section ${active === 3 ? `section-active slide-motion-${slideMotion}` : ''}`}>
         <SectionHeader eyebrow="02" title="Classificação das superfícies" text="Passe o mouse sobre uma classe para ver onde a peça fica na máquina." />
         <div className="class-scale" aria-label="Escala de exigência estética">
           {classes.map((item, index) => <button key={item.id} className={`class-item class-${item.id} ${selectedClass === item.id ? 'selected' : ''}`} onClick={(event) => chooseSurfaceClass(item.id, event)} onPointerDown={(event) => { classPointerType.current = event.pointerType; if (event.pointerType !== 'mouse') setClassPreviewPosition({ x: event.clientX, y: event.clientY }); }} onPointerEnter={(event) => { if (event.pointerType === 'mouse' && item.id === selectedClass) startClassPreview(item.id, event); }} onPointerMove={(event) => { if (event.pointerType === 'mouse' && item.id === selectedClass) setClassPreviewPosition({ x: event.clientX, y: event.clientY }); }} onPointerLeave={stopClassPreview} onBlur={stopClassPreview}><span className="class-number">{item.id}</span><span className="class-label">{item.label}</span><small>{index === 0 ? 'MAIOR EXIGÊNCIA ESTÉTICA' : index === 3 ? 'MENOR EXIGÊNCIA ESTÉTICA' : ''}</small></button>)}
@@ -552,7 +555,7 @@ function App() {
       </section>
 
       {/* Slide 5: matriz da STD 120-0014 e decisão de liberação interativa. */}
-      <section id="matriz" className={`presentation-section matrix-section ${active === 4 ? 'section-active' : ''}`}>
+      <section id="matriz" className={`presentation-section matrix-section ${active === 4 ? `section-active slide-motion-${slideMotion}` : ''}`}>
         <SectionHeader eyebrow="02.2" title="Defeitos e classes" text="A norma cruza aparência, grupo A–F, classe da superfície e quantidade. Escolha o defeito para consultar a regra correta." />
         <div className="matrix-wrap"><table><thead><tr><th>DEFEITO</th><th>TIPO</th><th>I · PRATICAMENTE INVISÍVEL</th><th>II · POUCO VISÍVEL</th><th>III · CLARAMENTE VISÍVEL</th></tr></thead><tbody>{defects.map((item) => <tr key={item.name} className={selectedDefect === item.name ? 'chosen' : ''} onClick={() => setSelectedDefect(item.name)}><th>{item.name}</th><td>{item.type}</td>{item.type === 'Visual' ? <><td>{item.visual.pouco.length ? item.visual.pouco.join('/') : '—'}</td><td>{item.visual.visivel.length ? item.visual.visivel.join('/') : '—'}</td><td>{item.visual.muito.length ? item.visual.muito.join('/') : '—'}</td></> : <td colSpan="3">{item.type === 'Mensurável' ? 'Medir em mm para enquadrar no grupo A–F' : item.policy === 'block' ? 'Não liberar automaticamente' : 'Comparar com o padrão aprovado'}</td>}</tr>)}</tbody></table></div>
         <div className="legend"><span><Status value="✓" /> PODE LIBERAR</span><span><Status value="!" /> LIBERAR CONDICIONADO / AVALIAR</span><span><Status value="✕" /> NÃO LIBERAR</span></div>
@@ -571,7 +574,7 @@ function App() {
       </section>
 
       {/* Slide 6: pontos críticos de inspeção e checklist opcional. */}
-      <section id="atencao" className={`presentation-section attention-section ${active === 5 ? 'section-active' : ''}`}>
+      <section id="atencao" className={`presentation-section attention-section ${active === 5 ? `section-active slide-motion-${slideMotion}` : ''}`}>
         <SectionHeader eyebrow="03" title="Pontos de atenção" text="Todos os exemplos abaixo são casos de reprova." />
         <div className="attention-grid magic-bento">
           <article className="attention-card photo-card magic-bento-card" onPointerMove={updateHoverParallax} onPointerLeave={resetHoverParallax}><img src="/assets/weld.jpg" alt="Ponto de solda e canto de peça" /><p>Olhar com atenção as bordas, quinas internas e regiões onde a tinta tende a acumular.</p></article>
@@ -586,7 +589,7 @@ function App() {
       </section>
 
       {/* Slide 7: exemplos de defeitos. Selecionar um cartão abre todas as fotos do problema. */}
-      <section id="exemplos" className={`presentation-section examples-section ${active === 6 ? 'section-active' : ''}`}>
+      <section id="exemplos" className={`presentation-section examples-section ${active === 6 ? `section-active slide-motion-${slideMotion}` : ''}`}>
         <SectionHeader eyebrow="03.2" title="Exemplos de não conformidades" text="Selecione um problema para abrir todas as fotos registradas." />
         <div className="gallery defect-gallery">
           {defectGalleries.map((gallery) => <button key={gallery.label} className="defect-gallery-card" onClick={() => { setOpenGallery(gallery); setExpandedGalleryImage(null); }}>
