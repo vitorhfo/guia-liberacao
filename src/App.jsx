@@ -1,6 +1,7 @@
 // Hooks do React que controlam navegação, consulta, galerias e interações por toque.
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { clientColorCatalog } from './client-colors';
 // Ícones usados na navegação, nos indicadores de status e nos cartões de inspeção.
 import {
   AlertTriangle,
@@ -273,7 +274,7 @@ function App() {
   const [active, setActive] = useState(0);
   const [leaving, setLeaving] = useState(null);
   const [slideMotion, setSlideMotion] = useState('forward');
-  const [showIntro, setShowIntro] = useState(true);
+  const [introPhase, setIntroPhase] = useState('intro');
   const [showSwipeHint, setShowSwipeHint] = useState(false);
   const [selectedClass, setSelectedClass] = useState('1');
   const [hoveredClass, setHoveredClass] = useState(null);
@@ -289,11 +290,24 @@ function App() {
   const [selectedMeasurementLevel, setSelectedMeasurementLevel] = useState('quase-nada');
   const [selectedQuantity, setSelectedQuantity] = useState('quase-nada');
   const [noHigherDefects, setNoHigherDefects] = useState(false);
+  // Cliente e cor limitam a consulta às opções presentes no faturamento recebido.
+  const [selectedClient, setSelectedClient] = useState('');
+  const [selectedClientColor, setSelectedClientColor] = useState('');
   // Estado do checklist opcional e da galeria de fotos dos defeitos.
   const [showChecklist, setShowChecklist] = useState(false);
   const [openGallery, setOpenGallery] = useState(null);
   const [expandedGalleryImage, setExpandedGalleryImage] = useState(null);
   const sections = useMemo(() => ['inicio', 'fluxo', 'condicoes', 'classes', 'matriz', 'atencao', 'exemplos'], []);
+  const showIntro = introPhase !== 'done';
+
+  // Mantém os mesmos tempos da abertura da plataforma de tomada de decisão.
+  useEffect(() => {
+    if (introPhase === 'done') return undefined;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const duration = introPhase === 'intro' ? (reducedMotion ? 1200 : 3600) : (reducedMotion ? 0 : 500);
+    const timer = window.setTimeout(() => setIntroPhase(introPhase === 'intro' ? 'exit' : 'done'), duration);
+    return () => window.clearTimeout(timer);
+  }, [introPhase]);
 
   // Troca de seção mantendo a navegação entre o primeiro e o último slide.
   const go = (index) => {
@@ -313,7 +327,7 @@ function App() {
   };
 
   // Encerra a abertura e libera a apresentação completa.
-  const closeIntro = () => setShowIntro(false);
+  const closeIntro = () => setIntroPhase('done');
 
   // Abre a imagem da classe selecionada após um pequeno tempo de espera no mouse.
   const startClassPreview = (id, event) => {
@@ -475,6 +489,12 @@ function App() {
     ? ' A quantidade adicional foi aplicada porque não há defeitos mais visíveis nesta área.'
     : '';
   const displayClass = classes.find((item) => item.id === selectedClass) ?? classes[0];
+  const clientColors = clientColorCatalog.find((item) => item.id === selectedClient);
+  const selectClient = (clientId) => {
+    const client = clientColorCatalog.find((item) => item.id === clientId);
+    setSelectedClient(clientId);
+    setSelectedClientColor(client?.colors[0] ?? '');
+  };
   const previewClass = classes.find((item) => item.id === hoveredClass);
   const previewStyle = previewClass ? {
     '--class-color': `var(--class-${previewClass.id})`,
@@ -485,18 +505,19 @@ function App() {
 
   // Estrutura da apresentação: navegação, sete slides, galeria modal e controles anterior/próximo.
   return (
-    <main onTouchStart={startSwipe} onTouchEnd={finishSwipe}>
-      {showIntro && <section className="site-intro" role="dialog" aria-modal="true" aria-label="Apresentação Blue Light e WV">
-        <div className="site-intro-grid" aria-hidden="true" />
-        <div className="site-intro-content">
-          <div className="site-intro-mark"><ShieldCheck size={22} /></div>
-          <p className="site-intro-kicker">QUEM SOMOS</p>
-          <h1><span>BLUE LIGHT</span><b>+</b><span>WV</span></h1>
-          <p className="site-intro-copy">Somos Blue Light e WV. Transformamos conhecimento técnico em experiências claras para decisões de qualidade.</p>
-          <button className="site-intro-skip" onClick={closeIntro}>Entrar no guia <ChevronRight size={16} /></button>
+    <>
+      {showIntro && <section className={`brand-intro ${introPhase === 'exit' ? 'brand-intro-exit' : ''}`} role="dialog" aria-modal="true" aria-labelledby="brand-intro-title">
+        <div className="brand-intro-grid" aria-hidden="true" />
+        <div className="brand-intro-content">
+          <p className="brand-intro-eyebrow">Quem somos</p>
+          <h1 id="brand-intro-title" className="brand-intro-title"><span className="brand-intro-blue">Blue Light</span><span className="brand-intro-connector">&amp;</span><span className="brand-intro-wv">WV</span></h1>
+          <div className="brand-intro-rule" aria-hidden="true" />
+          <p className="brand-intro-description">Guia de superfícies pintadas</p>
+          <p className="brand-intro-caption">Conhecimento técnico para inspeções de qualidade mais claras.</p>
         </div>
-        <div className="site-intro-progress" aria-hidden="true"><i /></div>
+        <button className="brand-intro-skip" onClick={closeIntro}>Entrar no guia <ChevronRight aria-hidden="true" /></button>
       </section>}
+    <main className={`brand-workspace ${showIntro ? 'brand-workspace-hidden' : 'brand-workspace-ready'}`} inert={showIntro} aria-hidden={showIntro || undefined} onTouchStart={startSwipe} onTouchEnd={finishSwipe}>
 
       {/* Cabeçalho fixo: marca, navegação de desktop e contador do slide atual. */}
       <nav className="topbar" aria-label="Navegação da apresentação">
@@ -603,7 +624,7 @@ function App() {
           <article className="attention-card photo-card magic-bento-card" onPointerMove={updateHoverParallax} onPointerLeave={resetHoverParallax}><img src="/assets/bubbles.jpg" alt="Peça pintada com bolhas" /><p>Verificar locais onde a peça foi apoiada, pendurada ou tocada durante o processo.</p></article>
           <article className="attention-card magic-bento-card" onPointerMove={updateHoverParallax} onPointerLeave={resetHoverParallax}><Paintbrush className="card-icon" size={38} /><h3>Falhas e resíduos</h3><p>Verificar se contém falhas de pintura e resíduos na peça, como sujeira.</p></article>
           <article className="attention-card magic-bento-card" onPointerMove={updateHoverParallax} onPointerLeave={resetHoverParallax}><ThermometerSun className="card-icon" size={38} /><h3>Forno e camadas</h3><p>Verificar a temperatura e a velocidade do forno, além do nível de camadas, para evitar desplacamento.</p></article>
-          <article className="attention-card magic-bento-card" onPointerMove={updateHoverParallax} onPointerLeave={resetHoverParallax}><Eye className="card-icon" size={38} /><h3>Cor e brilho</h3><p>Verificar desvios de cor e brilho, bem como respingos na superfície.</p></article>
+          <article className="attention-card color-client-card magic-bento-card" onPointerMove={updateHoverParallax} onPointerLeave={resetHoverParallax}><Eye className="card-icon" size={38} /><h3>Cor por cliente</h3><p>Escolha o cliente antes de conferir a cor. A lista só exibe cores e acabamentos já registrados no faturamento.</p><label>Cliente<select value={selectedClient} onChange={(event) => selectClient(event.target.value)}><option value="">Selecione o cliente</option>{clientColorCatalog.map((client) => <option key={client.id} value={client.id}>{client.name}</option>)}</select></label><label>Cor / acabamento<select value={selectedClientColor} onChange={(event) => setSelectedClientColor(event.target.value)} disabled={!clientColors}><option value="">{clientColors ? 'Selecione a cor' : 'Escolha primeiro o cliente'}</option>{clientColors?.colors.map((color) => <option key={color} value={color}>{color}</option>)}</select></label>{clientColors && <strong className="client-color-status">{selectedClientColor} é uma opção cadastrada para {clientColors.name}.</strong>}</article>
         </div>
         <button className="checklist-toggle" onClick={() => setShowChecklist(!showChecklist)}>{showChecklist ? 'Ocultar checklist' : 'Abrir checklist de inspeção'} <span>{showChecklist ? '−' : '+'}</span></button>
         {showChecklist && <div className="checklist"><label><input type="checkbox" /> Bordas, quinas internas e áreas de acúmulo verificadas</label><label><input type="checkbox" /> Pontos de apoio, gancho ou contato verificados</label><label><input type="checkbox" /> Falhas, sujeira, cor, brilho e respingos verificados</label><label><input type="checkbox" /> Condições de forno e camadas verificadas</label></div>}
@@ -636,6 +657,7 @@ function App() {
       {/* Botões de anterior e próximo para a navegação em desktop. */}
       <div className="floating-controls" aria-label="Controles de slide"><button onClick={() => go(active - 1)} disabled={active === 0} aria-label="Seção anterior"><ChevronLeft /></button><button onClick={() => go(active + 1)} disabled={active === sections.length - 1} aria-label="Próxima seção"><ChevronRight /></button></div>
     </main>
+    </>
   );
 }
 
